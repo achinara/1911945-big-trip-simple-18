@@ -7,15 +7,17 @@ import {render} from '../render.js';
 export default class TripPresenter {
   pointListComponent = new PointListView();
 
-  init = (container) => {
+  init = (container, pointModel) => {
     this.tripContainer = container;
+    this.pointModel = pointModel;
+    this.points = [...this.pointModel.getPoints()];
 
     render(new SortView(), this.tripContainer);
     render(this.pointListComponent, this.tripContainer);
     render(new PointEditView(), this.pointListComponent.getElement());
 
-    for (let i = 0; i < 3; i++) {
-      render(new PointView(), this.pointListComponent.getElement());
+    for (let i = 0; i < this.points.length; i++) {
+      render(new PointView(this.points[i]), this.pointListComponent.getElement());
     }
   };
 }
