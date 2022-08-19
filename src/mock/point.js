@@ -1,14 +1,16 @@
 import {getRandomValueFromArray} from '../utils.js';
 import {generateOffersByType} from './offersByType';
-import {POINT_TYPES, PRICES} from './const';
+import {generateDestinationByName} from './destination';
+import {POINT_TYPES, PRICES, CITIES} from './const';
 
 export const generatePoint = () => {
   const type = getRandomValueFromArray(POINT_TYPES);
+  const destination = generateDestinationByName(getRandomValueFromArray(CITIES));
   return {
     basePrice: getRandomValueFromArray(PRICES),
-    dateFrom: null,
-    dateTo: null,
-    destination: 'Amsterdam',
+    dateFrom: '2019-07-10T22:55:56.845Z',
+    dateTo: '2019-07-11T11:22:13.375Z',
+    destination,
     offers: generateOffersByType(type),
     type,
   };
