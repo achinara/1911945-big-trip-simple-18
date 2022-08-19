@@ -11,6 +11,6 @@ const DESCRIPTIONS = [
   'Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui. Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat',
 ];
 
-const OFFERS_TITLES = ['Add comfort place', 'Choice radio channel', 'Add meal', 'Switch to comfort', 'Add luggage', 'Travel by train'];
+const OFFERS_TITLES = ['Add comfort place', 'Choice music', 'Add meal', 'Switch to comfort', 'Add luggage', 'Travel by train'];
 
 export {POINT_TYPES, PRICES, CITIES, DESCRIPTIONS, OFFERS_TITLES};

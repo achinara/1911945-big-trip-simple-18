@@ -3,6 +3,7 @@ import {createOffersBLockTemplate} from './offers-block-view';
 import {createDestinationBlockTemplate} from './destination-block-view';
 import {createTypesSelectTemplate} from './types-select-view';
 import {createDestinationSelectTemplate} from './destination-select-view';
+import {getFullTime} from '../utils';
 
 const createPointEditTemplate = (pointEdit) => {
   const {destinations, point: {basePrice, dateFrom, dateTo, destination, offers, type}, types} = pointEdit;
@@ -34,10 +35,10 @@ const createPointEditTemplate = (pointEdit) => {
 
           <div class="event__field-group  event__field-group--time">
             <label class="visually-hidden" for="event-start-time-1">From</label>
-            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${dateFrom}">
+            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${getFullTime(dateFrom)}">
             &mdash;
             <label class="visually-hidden" for="event-end-time-1">To</label>
-            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${dateTo}">
+            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${getFullTime(dateTo)}">
           </div>
 
           <div class="event__field-group  event__field-group--price">

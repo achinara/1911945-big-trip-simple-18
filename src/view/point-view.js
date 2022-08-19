@@ -1,13 +1,13 @@
 import {createElement} from '../render.js';
 import {createOffersTemplate} from './point-offers-view';
-import {getTimeHourAndMinute} from '../utils';
+import {getMonth, getTimeHourAndMinute} from '../utils';
 
 const createPointTemplate = (point) => {
   const {type, basePrice, dateFrom, dateTo, destination, offers} = point;
   return (
     `<li class="trip-events__item">
       <div class="event">
-        <time class="event__date" datetime="2019-03-18">MAR 18</time>
+        <time class="event__date" datetime="2019-03-18">${getMonth(dateFrom)}</time>
         <div class="event__type">
           <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
         </div>
@@ -23,7 +23,7 @@ const createPointTemplate = (point) => {
           &euro;&nbsp;<span class="event__price-value">${basePrice}</span>
         </p>
         <h4 class="visually-hidden">Offers:</h4>
-        ${createOffersTemplate(offers)}
+        <ul class="event__selected-offers">${createOffersTemplate(offers)}</ul>
         <button class="event__rollup-btn" type="button">
           <span class="visually-hidden">Open event</span>
         </button>

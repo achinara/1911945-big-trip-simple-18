@@ -10,6 +10,10 @@ const getRandomInteger = (a = 0, b = 1) => {
 
 const getRandomValueFromArray = (array) => array[getRandomInteger(0, array.length - 1)];
 
+const getFullTime = (date) => dayjs(date).isValid() ? dayjs(date).format('DD/MM/YY HH:mm') : '';
+
+const getMonth = (date) => dayjs(date).isValid() ? dayjs(date).format('MMM DD') : '';
+
 const getTimeHourAndMinute = (date) => dayjs(date).isValid() ? dayjs(date).format('HH:mm') : '';
 
-export {getRandomInteger, getRandomValueFromArray, getTimeHourAndMinute};
+export {getRandomInteger, getRandomValueFromArray, getFullTime, getMonth, getTimeHourAndMinute};
