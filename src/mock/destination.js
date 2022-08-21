@@ -1,18 +1,24 @@
 import {getRandomInteger, getRandomValueFromArray} from '../utils';
 import {CITIES, DESCRIPTIONS} from './const';
 
-const generateDestinationByName = (name) => {
-  const NUM_PIC = getRandomInteger(5, 10);
-  return {
-    name,
-    description: `<b>${name}</b> is beauty city. ${getRandomValueFromArray(DESCRIPTIONS)}`,
-    pictures: Array.from({length: NUM_PIC }, (_value, index) => ({
+const destinationsById = CITIES.reduce((acc, city) => {
+  const numPics = getRandomInteger(5, 10);
+  const description = `<b>${city}</b> is beauty city. ${getRandomValueFromArray(DESCRIPTIONS)}`;
+
+  acc[city] = {
+    id: city,
+    name: city,
+    description,
+    pictures: Array.from({length: numPics }, (_value, index) => ({
       src: `http://picsum.photos/248/152?r=${index}`,
-      description: 'Chamonix parliament bui',
+      description,
     }))
   };
-};
+  return acc;
+}, {});
 
-const generateDestinations = () => CITIES.map((value) => generateDestinationByName(value));
+const generateDestinationById = (id) => destinationsById[id];
 
-export {generateDestinationByName, generateDestinations};
+const generateDestinations = () => Object.values(destinationsById);
+
+export {generateDestinationById, generateDestinations};

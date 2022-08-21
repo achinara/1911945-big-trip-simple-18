@@ -21,7 +21,7 @@ const createPointEditTemplate = (pointEdit) => {
             <div class="event__type-list">
               <fieldset class="event__type-group">
                 <legend class="visually-hidden">Event type</legend>
-                ${createTypesSelectTemplate(types)}
+                ${createTypesSelectTemplate(type,types)}
               </fieldset>
             </div>
           </div>
