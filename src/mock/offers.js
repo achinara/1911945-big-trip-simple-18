@@ -1,6 +1,12 @@
-import {getRandomInteger} from '../utils';
-import {generateOffer} from './offer';
-import {POINT_TYPES} from './const';
+import uniqid from 'uniqid';
+import {getRandomInteger} from './utils.js';
+import {OFFERS_TITLES, POINT_TYPES} from './const.js';
+
+export const generateOffer = (index) => ({
+  id: uniqid(),
+  title: OFFERS_TITLES[index],
+  price: getRandomInteger(5, 55),
+});
 
 const setPoints = new Set(POINT_TYPES);
 setPoints.delete('bus');
@@ -17,3 +23,4 @@ export const generateOffersByType = (type) => ({
   offers: offersById[type] || [],
 });
 
+export const generateOffers = () => POINT_TYPES.map((type) => generateOffersByType(type));

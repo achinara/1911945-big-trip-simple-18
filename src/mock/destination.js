@@ -1,5 +1,5 @@
-import {getRandomInteger, getRandomValueFromArray} from '../utils';
-import {CITIES, DESCRIPTIONS} from './const';
+import {getRandomInteger, getRandomValueFromArray} from './utils.js';
+import {CITIES, DESCRIPTIONS} from './const.js';
 
 const destinationsById = CITIES.reduce((acc, city) => {
   const numPics = getRandomInteger(5, 10);
@@ -17,8 +17,6 @@ const destinationsById = CITIES.reduce((acc, city) => {
   return acc;
 }, {});
 
-const generateDestinationById = (id) => destinationsById[id];
-
 const generateDestinations = () => Object.values(destinationsById);
 
-export {generateDestinationById, generateDestinations};
+export {generateDestinations};

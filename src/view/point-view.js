@@ -1,22 +1,22 @@
 import {createElement} from '../render.js';
-import {createOffersTemplate} from './point-offers-view';
-import {getMonth, getTimeHourAndMinute} from '../utils';
+import {createOffersTemplate} from './point-offers-view.js';
+import {formatMonthAndDate, formatHourAndMinute} from '../utils.js';
 
 const createPointTemplate = (point) => {
   const {type, basePrice, dateFrom, dateTo, destination, offers} = point;
   return (
     `<li class="trip-events__item">
       <div class="event">
-        <time class="event__date" datetime="2019-03-18">${getMonth(dateFrom)}</time>
+        <time class="event__date" datetime="2019-03-18">${formatMonthAndDate(dateFrom)}</time>
         <div class="event__type">
           <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
         </div>
         <h3 class="event__title">${type} ${destination.name}</h3>
         <div class="event__schedule">
           <p class="event__time">
-            <time class="event__start-time" datetime="${dateFrom}">${getTimeHourAndMinute(dateFrom)}</time>
+            <time class="event__start-time" datetime="${dateFrom}">${formatHourAndMinute(dateFrom)}</time>
             &mdash;
-            <time class="event__end-time" datetime="${dateTo}">${getTimeHourAndMinute(dateTo)}</time>
+            <time class="event__end-time" datetime="${dateTo}">${formatHourAndMinute(dateTo)}</time>
           </p>
         </div>
         <p class="event__price">
@@ -33,23 +33,24 @@ const createPointTemplate = (point) => {
 };
 
 export default class PointView {
+  #element = null;
   constructor(point) {
     this.point = point;
   }
 
-  getTemplate() {
+  get template() {
     return createPointTemplate(this.point);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
 
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }
