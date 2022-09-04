@@ -1,12 +1,12 @@
 import {createElement} from '../render.js';
-import {createOffersBLockTemplate} from './offers-block-view';
-import {createDestinationBlockTemplate} from './destination-block-view';
-import {createTypesSelectTemplate} from './types-select-view';
-import {createDestinationSelectTemplate} from './destination-select-view';
-import {getFullTime} from '../utils';
+import {createOffersBLockTemplate} from './offers-block-view.js';
+import {createDestinationBlockTemplate} from './destination-block-view.js';
+import {createTypesSelectTemplate} from './types-select-view.js';
+import {createDestinationSelectTemplate} from './destination-select-view.js';
+import {formatFullTime} from '../utils.js';
 
-const createPointEditTemplate = (pointEdit) => {
-  const {destinations, point: {basePrice, dateFrom, dateTo, destination, offers, type}, types} = pointEdit;
+const createPointEditTemplate = (pointEdit, destinations, types) => {
+  const {basePrice, dateFrom, dateTo, destination, offers: pointOffers, type} = pointEdit;
   return `
     <li class="trip-events__item">
       <form class="event event--edit" action="#" method="post">
@@ -21,7 +21,7 @@ const createPointEditTemplate = (pointEdit) => {
             <div class="event__type-list">
               <fieldset class="event__type-group">
                 <legend class="visually-hidden">Event type</legend>
-                ${createTypesSelectTemplate(type,types)}
+                ${createTypesSelectTemplate(type, types)}
               </fieldset>
             </div>
           </div>
@@ -35,10 +35,10 @@ const createPointEditTemplate = (pointEdit) => {
 
           <div class="event__field-group  event__field-group--time">
             <label class="visually-hidden" for="event-start-time-1">From</label>
-            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${getFullTime(dateFrom)}">
+            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${formatFullTime(dateFrom)}">
             &mdash;
             <label class="visually-hidden" for="event-end-time-1">To</label>
-            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${getFullTime(dateTo)}">
+            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${formatFullTime(dateTo)}">
           </div>
 
           <div class="event__field-group  event__field-group--price">
@@ -56,7 +56,7 @@ const createPointEditTemplate = (pointEdit) => {
           </button>
         </header>
         <section class="event__details">
-          ${createOffersBLockTemplate(offers)}
+          ${createOffersBLockTemplate(pointOffers)}
           ${createDestinationBlockTemplate(destination)}
         </section>
       </form>
@@ -64,12 +64,16 @@ const createPointEditTemplate = (pointEdit) => {
 };
 
 export default class PointEditView {
-  constructor(pointEdit) {
+  constructor(pointEdit, destinations, offers) {
     this.pointEdit = pointEdit;
+    this.destinations = destinations;
+    this.offers = offers;
+    this.types = this.offers.map((offer) => offer.type);
   }
 
   getTemplate() {
-    return createPointEditTemplate(this.pointEdit);
+    console.log(this.pointEdit);
+    return createPointEditTemplate(this.pointEdit, this.destinations, this.types);
   }
 
   getElement() {
