@@ -3,9 +3,9 @@ import {generateDestinations} from '../mock/destination.js';
 import {generateOffers, generateOffersByType} from '../mock/offers.js';
 
 export default class PointModel {
-  destinations = generateDestinations();
-  offers = generateOffers();
-  points = Array.from({length: 4}, () => {
+  #destinations = generateDestinations();
+  #offers = generateOffers();
+  #points = Array.from({length: 4}, () => {
     const point = generatePoint();
     const offers = generateOffersByType(point.type).offers;
     return {
@@ -15,9 +15,15 @@ export default class PointModel {
     };
   });
 
-  getDestinations = () => this.destinations;
+  get destinations() {
+    return this.#destinations;
+  }
 
-  getOffers = () => this.offers;
+  get offers() {
+    return this.#offers;
+  }
 
-  getPoints = () => this.points;
+  get points() {
+    return this.#points;
+  }
 }

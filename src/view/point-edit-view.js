@@ -64,27 +64,32 @@ const createPointEditTemplate = (pointEdit, destinations, types) => {
 };
 
 export default class PointEditView {
+  #element = null;
+  #pointEdit = null;
+  #destinations = null;
+  #offers = null;
+  #types = null;
+
   constructor(pointEdit, destinations, offers) {
-    this.pointEdit = pointEdit;
-    this.destinations = destinations;
-    this.offers = offers;
-    this.types = this.offers.map((offer) => offer.type);
+    this.#pointEdit = pointEdit;
+    this.#destinations = destinations;
+    this.#offers = offers;
+    this.#types = this.#offers.map((offer) => offer.type);
   }
 
-  getTemplate() {
-    console.log(this.pointEdit);
-    return createPointEditTemplate(this.pointEdit, this.destinations, this.types);
+  get template() {
+    return createPointEditTemplate(this.#pointEdit, this.#destinations, this.#types);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
 
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }
