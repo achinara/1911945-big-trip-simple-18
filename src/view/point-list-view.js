@@ -4,6 +4,7 @@ const createPointListTemplate = () => '<ul class="trip-events__list"></ul>';
 
 export default class PointListView {
   #element = null;
+
   get template() {
     return createPointListTemplate();
   }

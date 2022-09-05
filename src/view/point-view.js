@@ -1,6 +1,18 @@
 import {createElement} from '../render.js';
-import {createOffersTemplate} from './point-offers-view.js';
 import {formatMonthAndDate, formatHourAndMinute} from '../utils.js';
+
+const createOffersTemplate = (offers) => {
+  if (!offers.length) {
+    return '';
+  }
+  return offers.reduce((acc, offer)=>`${acc}
+    <li class="event__offer">
+      <span class="event__offer-title">${offer.title}</span>
+      &plus;&euro;&nbsp;
+      <span class="event__offer-price">${offer.price}</span>
+    </li>
+  `, '');
+};
 
 const createPointTemplate = (point) => {
   const {type, basePrice, dateFrom, dateTo, destination, offers} = point;
@@ -34,6 +46,7 @@ const createPointTemplate = (point) => {
 
 export default class PointView {
   #element = null;
+
   constructor(point) {
     this.point = point;
   }
