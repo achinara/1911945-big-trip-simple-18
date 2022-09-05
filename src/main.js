@@ -1,7 +1,7 @@
-import FilterView from './view/filter-view.js';
-import TripPresenter from './presenter/trip-presenter.js';
-import PointModel from './model/point-model.js';
-import {render} from './render.js';
+import FilterView from './view/filter-view';
+import TripPresenter from './presenter/trip-presenter';
+import PointModel from './model/point-model';
+import {render} from './render';
 
 const filterContainer = document.querySelector('.trip-controls__filters');
 const tripContainer = document.querySelector('.trip-events');

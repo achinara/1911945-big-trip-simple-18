@@ -1,11 +1,68 @@
-import {createElement} from '../render.js';
-import {createOffersBLockTemplate} from './offers-block-view.js';
-import {createDestinationBlockTemplate} from './destination-block-view.js';
-import {createTypesSelectTemplate} from './types-select-view.js';
-import {createDestinationSelectTemplate} from './destination-select-view.js';
-import {formatFullTime} from '../utils.js';
+import {createElement} from '../render';
+import {formatFullTime} from '../utils';
 
-const createPointEditTemplate = (pointEdit, destinations, types) => {
+const createTypesSelectTemplate = (active, types) => types.reduce((acc, type) =>
+  `${acc}
+      <div class="event__type-item">
+        <input id="event-type-${type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}" ${(active === type) ? 'checked' : ''}>
+        <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${type.charAt(0).toUpperCase() + type.slice(1)}</label>
+      </div>
+    `, '');
+
+const createDestinationSelectTemplate = (current, destinations) => {
+  const options = destinations.reduce((acc, dest) => `${acc}
+    <option value="${dest.name}"></option>
+  `, '');
+
+  return `
+    <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${current}" list="destination-list-1">
+    <datalist id="destination-list-1">${options}</datalist>
+  `;
+};
+
+const createOffersBLockTemplate = (offers, checkedOffers) => {
+  if (!offers.length) {
+    return '';
+  }
+  const items = offers.reduce((acc, offer) =>
+    `${acc}
+      <div class="event__offer-selector">
+        <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" ${checkedOffers.includes(offer) ? 'checked' : ''} >
+        <label class="event__offer-label" for="event-offer-luggage-1">
+          <span class="event__offer-title">${offer.title}</span>
+          &plus;&euro;&nbsp;
+          <span class="event__offer-price">${offer.price}</span>
+        </label>
+      </div>
+  `, '');
+  return `
+    <section class="event__section  event__section--offers">
+      <h3 class="event__section-title  event__section-title--offers">Offers</h3>
+      <div class="event__available-offers">${items}</div>
+    </section>
+  `;
+};
+
+const createDestinationBlockTemplate = (destination) => {
+  if (!destination) {
+    return '';
+  }
+  const {pictures, description} = destination;
+  const pics = pictures.reduce((acc, pic)=>`${acc}
+    <img class="event__photo" src="${pic.src}" alt="${pic.description}">
+  `, '');
+
+  return `
+    <section class="event__section  event__section--destination">
+      <h3 class="event__section-title  event__section-title--destination">Destination</h3>
+      <p class="event__destination-description">${description}</p>
+      <div class="event__photos-container">
+        <div class="event__photos-tape">${pics}</div>
+      </div>
+    </section>`;
+};
+
+const createPointEditTemplate = (pointEdit, destinations, offers, types) => {
   const {basePrice, dateFrom, dateTo, destination, offers: pointOffers, type} = pointEdit;
   return `
     <li class="trip-events__item">
@@ -56,7 +113,7 @@ const createPointEditTemplate = (pointEdit, destinations, types) => {
           </button>
         </header>
         <section class="event__details">
-          ${createOffersBLockTemplate(pointOffers)}
+          ${createOffersBLockTemplate(offers, pointOffers)}
           ${createDestinationBlockTemplate(destination)}
         </section>
       </form>
@@ -73,12 +130,12 @@ export default class PointEditView {
   constructor(pointEdit, destinations, offers) {
     this.#pointEdit = pointEdit;
     this.#destinations = destinations;
-    this.#offers = offers;
-    this.#types = this.#offers.map((offer) => offer.type);
+    this.#offers = offers.find((o) => o.type === pointEdit.type).offers;
+    this.#types = offers.map((offer) => offer.type);
   }
 
   get template() {
-    return createPointEditTemplate(this.#pointEdit, this.#destinations, this.#types);
+    return createPointEditTemplate(this.#pointEdit, this.#destinations, this.#offers, this.#types);
   }
 
   get element() {

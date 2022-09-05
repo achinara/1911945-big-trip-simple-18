@@ -1,5 +1,5 @@
-import {getRandomInteger, getRandomValueFromArray} from './utils.js';
-import {CITIES, DESCRIPTIONS} from './const.js';
+import {getRandomInteger, getRandomValueFromArray} from './utils';
+import {CITIES, DESCRIPTIONS} from './const';
 
 const destinationsById = CITIES.reduce((acc, city) => {
   const numPics = getRandomInteger(5, 10);

@@ -1,16 +1,16 @@
-import {generatePoint} from '../mock/point.js';
-import {generateDestinations} from '../mock/destination.js';
-import {generateOffers, generateOffersByType} from '../mock/offers.js';
+import {generatePoints} from '../mock/point';
+import {generateDestinations} from '../mock/destination';
+import {generateOffers} from '../mock/offers';
 
 export default class PointModel {
   #destinations = generateDestinations();
   #offers = generateOffers();
-  #points = Array.from({length: 4}, () => {
-    const point = generatePoint();
-    const offers = generateOffersByType(point.type).offers;
+  #points = generatePoints();
+  #normalizedPoints = this.#points.map((point) => {
+    const offers = this.#offers.find((o) => o.type === point.type).offers;
     return {
       ...point,
-      destination: this.destinations.find((d) => d.id === point.destination),
+      destination: this.#destinations.find((d) => d.id === point.destination),
       offers: offers.filter(({id}) => point.offers.includes(id)),
     };
   });
@@ -24,6 +24,6 @@ export default class PointModel {
   }
 
   get points() {
-    return this.#points;
+    return this.#normalizedPoints;
   }
 }
