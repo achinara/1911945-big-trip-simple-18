@@ -5,7 +5,7 @@ import {createTypesSelectTemplate} from './types-select-view.js';
 import {createDestinationSelectTemplate} from './destination-select-view.js';
 import {formatFullTime} from '../utils.js';
 
-const createPointEditTemplate = (pointEdit, destinations, types) => {
+const createPointEditTemplate = (pointEdit, destinations, offers, types) => {
   const {basePrice, dateFrom, dateTo, destination, offers: pointOffers, type} = pointEdit;
   return `
     <li class="trip-events__item">
@@ -56,7 +56,7 @@ const createPointEditTemplate = (pointEdit, destinations, types) => {
           </button>
         </header>
         <section class="event__details">
-          ${createOffersBLockTemplate(pointOffers)}
+          ${createOffersBLockTemplate(offers, pointOffers)}
           ${createDestinationBlockTemplate(destination)}
         </section>
       </form>
@@ -73,12 +73,12 @@ export default class PointEditView {
   constructor(pointEdit, destinations, offers) {
     this.#pointEdit = pointEdit;
     this.#destinations = destinations;
-    this.#offers = offers;
-    this.#types = this.#offers.map((offer) => offer.type);
+    this.#offers = offers.find((o) => o.type === pointEdit.type).offers;
+    this.#types = offers.map((offer) => offer.type);
   }
 
   get template() {
-    return createPointEditTemplate(this.#pointEdit, this.#destinations, this.#types);
+    return createPointEditTemplate(this.#pointEdit, this.#destinations, this.#offers, this.#types);
   }
 
   get element() {

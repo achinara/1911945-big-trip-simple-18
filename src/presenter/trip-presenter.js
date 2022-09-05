@@ -20,7 +20,7 @@ export default class TripPresenter {
     render(new SortView(), this.#tripContainer);
     render(this.#pointListComponent, this.#tripContainer);
 
-    for (let i = 1; i < points.length; i++) {
+    for (let i = 0; i < points.length; i++) {
       this.#renderPoint(points[i]);
     }
   };

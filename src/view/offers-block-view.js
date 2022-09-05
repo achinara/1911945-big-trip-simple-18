@@ -1,11 +1,11 @@
-const createOffersBLockTemplate = (offers) => {
+const createOffersBLockTemplate = (offers, checkedOffers) => {
   if (!offers.length) {
     return '';
   }
-  const items = offers.reduce((acc, offer, index) =>
+  const items = offers.reduce((acc, offer) =>
     `${acc}
       <div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" ${(index === 1 || index === 3) ? 'checked' : ''} >
+        <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" ${checkedOffers.includes(offer) ? 'checked' : ''} >
         <label class="event__offer-label" for="event-offer-luggage-1">
           <span class="event__offer-title">${offer.title}</span>
           &plus;&euro;&nbsp;
