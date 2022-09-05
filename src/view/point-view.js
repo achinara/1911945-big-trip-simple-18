@@ -1,5 +1,5 @@
-import {createElement} from '../render.js';
-import {formatMonthAndDate, formatHourAndMinute} from '../utils.js';
+import {createElement} from '../render';
+import {formatMonthAndDate, formatHourAndMinute} from '../utils';
 
 const createOffersTemplate = (offers) => {
   if (!offers.length) {

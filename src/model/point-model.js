@@ -1,6 +1,6 @@
-import {generatePoints} from '../mock/point.js';
-import {generateDestinations} from '../mock/destination.js';
-import {generateOffers} from '../mock/offers.js';
+import {generatePoints} from '../mock/point';
+import {generateDestinations} from '../mock/destination';
+import {generateOffers} from '../mock/offers';
 
 export default class PointModel {
   #destinations = generateDestinations();

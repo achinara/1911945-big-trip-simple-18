@@ -1,5 +1,5 @@
-import {createElement} from '../render.js';
-import {formatFullTime} from '../utils.js';
+import {createElement} from '../render';
+import {formatFullTime} from '../utils';
 
 const createTypesSelectTemplate = (active, types) => types.reduce((acc, type) =>
   `${acc}

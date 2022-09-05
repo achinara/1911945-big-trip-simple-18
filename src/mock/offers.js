@@ -1,6 +1,6 @@
 import uniqid from 'uniqid';
-import {getRandomInteger} from './utils.js';
-import {OFFERS_TITLES, POINT_TYPES} from './const.js';
+import {getRandomInteger} from './utils';
+import {OFFERS_TITLES, POINT_TYPES} from './const';
 
 export const generateOffer = (index) => ({
   id: uniqid(),

@@ -1,6 +1,6 @@
-import {getRandomInteger, getRandomValueFromArray, shuffleArray} from './utils.js';
-import {generateOffersByType} from './offers.js';
-import {POINT_TYPES, PRICES, CITIES} from './const.js';
+import {getRandomInteger, getRandomValueFromArray, shuffleArray} from './utils';
+import {generateOffersByType} from './offers';
+import {POINT_TYPES, PRICES, CITIES} from './const';
 
 const COUNT_POINTS = 4;
 

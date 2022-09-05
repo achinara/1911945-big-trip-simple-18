@@ -1,9 +1,9 @@
-import NoPoints from '../view/no-points.js';
-import PointView from '../view/point-view.js';
-import PointEditView from '../view/point-edit-view.js';
-import PointListView from '../view/point-list-view.js';
-import SortView from '../view/sort-view.js';
-import {render} from '../render.js';
+import NoPoints from '../view/no-points';
+import PointView from '../view/point-view';
+import PointEditView from '../view/point-edit-view';
+import PointListView from '../view/point-list-view';
+import SortView from '../view/sort-view';
+import {render} from '../render';
 
 export default class TripPresenter {
   #pointListComponent = new PointListView();

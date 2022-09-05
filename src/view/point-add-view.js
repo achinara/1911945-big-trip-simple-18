@@ -1,4 +1,4 @@
-import {createElement} from '../render.js';
+import {createElement} from '../render';
 
 const createPointAddTemplate = () => `
   <li class="trip-events__item">

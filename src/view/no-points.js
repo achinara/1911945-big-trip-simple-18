@@ -1,4 +1,4 @@
-import {createElement} from '../render.js';
+import {createElement} from '../render';
 
 const createTemplate = () => '<p class="trip-events__msg">Click New Event to create your first point</p>';
 
