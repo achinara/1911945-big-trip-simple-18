@@ -1,3 +1,4 @@
+import NoPoints from '../view/no-points.js';
 import PointView from '../view/point-view.js';
 import PointEditView from '../view/point-edit-view.js';
 import PointListView from '../view/point-list-view.js';
@@ -9,20 +10,16 @@ export default class TripPresenter {
   #tripContainer = null;
   #pointModel = null;
 
+  #points = [];
+
   constructor(container, pointModel) {
     this.#tripContainer = container;
     this.#pointModel = pointModel;
   }
 
   init = () => {
-    const points = [...this.#pointModel.points];
-
-    render(new SortView(), this.#tripContainer);
-    render(this.#pointListComponent, this.#tripContainer);
-
-    for (let i = 0; i < points.length; i++) {
-      this.#renderPoint(points[i]);
-    }
+    this.#points = [...this.#pointModel.points];
+    this.#renderContent();
   };
 
   #renderPoint = (point) => {
@@ -62,5 +59,19 @@ export default class TripPresenter {
     });
 
     render(pointComponent, this.#pointListComponent.element);
+  };
+
+  #renderContent = () => {
+    if (!this.#points.length) {
+      render(new NoPoints(), this.#tripContainer);
+      return;
+    }
+
+    render(new SortView(), this.#tripContainer);
+    render(this.#pointListComponent, this.#tripContainer);
+
+    for (let i = 0; i < this.#points.length; i++) {
+      this.#renderPoint(this.#points[i]);
+    }
   };
 }
