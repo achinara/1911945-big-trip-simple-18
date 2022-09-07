@@ -1,5 +1,5 @@
-import {createElement} from '../render';
-import {formatMonthAndDate, formatHourAndMinute} from '../utils';
+import AbstractView from '../framework/view/abstract-view';
+import {formatMonthAndDate, formatHourAndMinute} from '../utils/format-date';
 
 const createOffersTemplate = (offers) => {
   if (!offers.length) {
@@ -44,10 +44,9 @@ const createPointTemplate = (point) => {
   );
 };
 
-export default class PointView {
-  #element = null;
-
+export default class PointView extends AbstractView {
   constructor(point) {
+    super();
     this.point = point;
   }
 
@@ -55,15 +54,12 @@ export default class PointView {
     return createPointTemplate(this.point);
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
+  setClickHandler = (callback) => {
+    this._callback.editClick = callback;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#clickHandler);
+  };
 
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
-  }
+  #clickHandler = () => {
+    this._callback.editClick();
+  };
 }

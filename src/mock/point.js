@@ -1,3 +1,4 @@
+import uniqid from 'uniqid';
 import {getRandomInteger, getRandomValueFromArray, shuffleArray} from './utils';
 import {generateOffersByType} from './offers';
 import {POINT_TYPES, PRICES, CITIES} from './const';
@@ -14,7 +15,7 @@ const generatePoint = () => {
     dateFrom: `2019-0${getRandomInteger(1, 6)}-10T22:55:56.845Z`,
     dateTo: '2019-07-11T09:22:13.375Z',
     destination: getRandomValueFromArray(CITIES),
-    id: getRandomInteger(10, 30),
+    id: uniqid(),
     offers,
     type,
   };
