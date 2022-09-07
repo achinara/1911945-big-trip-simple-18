@@ -44,19 +44,13 @@ export default class TripPresenter {
       }
     };
 
-    pointComponent.element.querySelector('.event__rollup-btn').addEventListener('click', () => {
+    pointComponent.setClickHandler(() => {
       replacePointToForm();
-    });
-
-    pointEditComponent.element.querySelector('form').addEventListener('submit', (evt) => {
-      evt.preventDefault();
-      replaceFormToPoint();
       document.addEventListener('keydown', onEscKeyDown);
     });
 
-    pointEditComponent.element.querySelector('.event__rollup-btn').addEventListener('click', () => {
-      replaceFormToPoint();
-    });
+    pointEditComponent.setSubmitFormHandler(replaceFormToPoint);
+    pointEditComponent.setCloseFormHandler(replaceFormToPoint);
 
     render(pointComponent, this.#pointListComponent.element);
   };
