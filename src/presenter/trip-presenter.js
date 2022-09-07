@@ -3,7 +3,7 @@ import PointView from '../view/point-view';
 import PointEditView from '../view/point-edit-view';
 import PointListView from '../view/point-list-view';
 import SortView from '../view/sort-view';
-import {render} from '../render';
+import {render, replace} from '../framework/render';
 
 export default class TripPresenter {
   #pointListComponent = new PointListView();
@@ -29,11 +29,11 @@ export default class TripPresenter {
     const pointEditComponent = new PointEditView(point, destinations, offers);
 
     const replacePointToForm = () => {
-      this.#pointListComponent.element.replaceChild(pointEditComponent.element, pointComponent.element);
+      replace(pointEditComponent, pointComponent);
     };
 
     const replaceFormToPoint = () => {
-      this.#pointListComponent.element.replaceChild(pointComponent.element, pointEditComponent.element);
+      replace(pointComponent, pointEditComponent);
     };
 
     const onEscKeyDown = (evt) => {

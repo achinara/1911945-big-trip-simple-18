@@ -1,6 +1,6 @@
 import AbstractView from '../framework/view/abstract-view';
 
-import {formatFullTime} from '../utils';
+import {formatFullTime} from '../utils/format-date';
 
 const createTypesSelectTemplate = (pointId, active, types) => types.reduce((acc, type) =>
   `${acc}

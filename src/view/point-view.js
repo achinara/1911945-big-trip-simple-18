@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view';
-import {formatMonthAndDate, formatHourAndMinute} from '../utils';
+import {formatMonthAndDate, formatHourAndMinute} from '../utils/format-date';
 
 const createOffersTemplate = (offers) => {
   if (!offers.length) {
