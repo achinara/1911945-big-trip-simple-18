@@ -4,7 +4,7 @@ import SortView from '../view/sort-view';
 import PointPresenter from './point-presenter';
 import {render} from '../framework/render';
 
-export default class TripPresenter {
+export default class BoardPresenter {
   #pointListComponent = new PointListView();
   #sortComponent = new SortView();
   #noPoints = new NoPoints();
@@ -12,6 +12,7 @@ export default class TripPresenter {
   #pointModel = null;
 
   #points = [];
+  #pointPresenter = new Map();
 
   constructor(container, pointModel) {
     this.#tripContainer = container;
@@ -23,11 +24,17 @@ export default class TripPresenter {
     this.#renderContent();
   };
 
+  #handleModeChange = () => {
+    this.#pointPresenter.forEach((presenter) => presenter.resetView());
+  };
+
   #renderPoint = (point) => {
     const destinations = this.#pointModel.destinations;
     const offers = this.#pointModel.offers;
-    const pointPresenter = new PointPresenter(this.#pointListComponent.element, offers, destinations);
+    const pointPresenter = new PointPresenter(this.#pointListComponent.element, offers, destinations, this.#handleModeChange);
     pointPresenter.init(point);
+
+    this.#pointPresenter.set(point.id, pointPresenter);
   };
 
   #renderSort = () => {
