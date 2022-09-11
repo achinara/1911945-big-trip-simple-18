@@ -28,14 +28,14 @@ export default class PointPresenter {
 
   #replacePointToForm = () => {
     replace(this.#pointEditComponent, this.#pointComponent);
-    document.addEventListener('keydown', this.#escKeyDownHandler);
+    this.#addEventEscDown();
     this.#changeMode();
     this.#mode = Mode.EDITING;
   };
 
   #replaceFormToPoint = () => {
     replace(this.#pointComponent, this.#pointEditComponent);
-    document.removeEventListener('keydown', this.#escKeyDownHandler);
+    this.#removeEventEscDown();
     this.#mode = Mode.DEFAULT;
   };
 
@@ -43,8 +43,16 @@ export default class PointPresenter {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
       this.#replaceFormToPoint();
-      document.removeEventListener('keydown', this.#escKeyDownHandler);
+      this.#removeEventEscDown();
     }
+  };
+
+  #addEventEscDown = () => {
+    document.addEventListener('keydown', this.#escKeyDownHandler);
+  };
+
+  #removeEventEscDown = () => {
+    document.removeEventListener('keydown', this.#escKeyDownHandler);
   };
 
   resetView = () => {
