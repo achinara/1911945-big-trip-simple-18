@@ -3,6 +3,8 @@ import PointListView from '../view/point-list-view';
 import SortView from '../view/sort-view';
 import PointPresenter from './point-presenter';
 import {render} from '../framework/render';
+import {sortByDate, sortByPrice} from '../utils/sort';
+import {SortType} from '../const';
 
 export default class BoardPresenter {
   #pointListComponent = new PointListView();
@@ -13,6 +15,10 @@ export default class BoardPresenter {
 
   #points = [];
   #pointPresenter = new Map();
+  #initialPoints = [];
+  #pointsSortedByDate = [];
+
+  #currentSortType = SortType.DEFAULT;
 
   constructor(container, pointModel) {
     this.#tripContainer = container;
@@ -20,12 +26,30 @@ export default class BoardPresenter {
   }
 
   init = () => {
-    this.#points = [...this.#pointModel.points];
+    this.#initialPoints = [...this.#pointModel.points];
+    this.#pointsSortedByDate = this.#initialPoints.sort(sortByDate);
+    this.#points = [...this.#pointsSortedByDate];
     this.#renderContent();
   };
 
   #handleModeChange = () => {
     this.#pointPresenter.forEach((presenter) => presenter.resetView());
+  };
+
+  #handleSortChange = (sortType) => {
+    if (this.#currentSortType === sortType) {
+      return;
+    }
+
+    if (sortType === SortType.PRICE) {
+      this.#points.sort(sortByPrice);
+    } else {
+      this.#points = [...this.#pointsSortedByDate];
+    }
+
+    this.#currentSortType = sortType;
+    this.#clearPointList();
+    this.#renderPointList();
   };
 
   #renderPoint = (point) => {
@@ -39,10 +63,16 @@ export default class BoardPresenter {
 
   #renderSort = () => {
     render(this.#sortComponent, this.#tripContainer);
+    this.#sortComponent.setSortChangeHandler(this.#handleSortChange);
   };
 
   #renderNoPoints = () => {
     render(this.#noPoints, this.#tripContainer);
+  };
+
+  #clearPointList = () => {
+    this.#pointPresenter.forEach((presenter) => presenter.destroy());
+    this.#pointPresenter.clear();
   };
 
   #renderPointList = () => {
