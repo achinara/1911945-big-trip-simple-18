@@ -1,3 +1,4 @@
+import uniqid from 'uniqid';
 import {getRandomInteger, getRandomValueFromArray} from './utils';
 import {CITIES, DESCRIPTIONS} from './const';
 
@@ -6,7 +7,7 @@ const destinationsById = CITIES.reduce((acc, city) => {
   const description = `<b>${city}</b> is beauty city. ${getRandomValueFromArray(DESCRIPTIONS)}`;
 
   acc[city] = {
-    id: city,
+    id: uniqid(),
     name: city,
     description,
     pictures: Array.from({length: numPics }, (_value, index) => ({
