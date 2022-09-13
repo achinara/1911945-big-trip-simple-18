@@ -1,4 +1,5 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view';
+import {capitalize} from '../utils/common';
 
 import {formatFullTime} from '../utils/format-date';
 
@@ -6,18 +7,21 @@ const createTypesSelectTemplate = (pointId, active, types) => types.reduce((acc,
   `${acc}
       <div class="event__type-item">
         <input id="event-type-${type}-${pointId}" class="event__type-input visually-hidden" type="radio" name="event-type" value="${type}" ${(active === type) ? 'checked' : ''}>
-        <label class="event__type-label event__type-label--${type}" for="event-type-${type}-${pointId}">${type.charAt(0).toUpperCase() + type.slice(1)}</label>
+        <label class="event__type-label event__type-label--${type}" for="event-type-${type}-${pointId}">${capitalize(type)}</label>
       </div>
     `, '');
 
-const createDestinationSelectTemplate = (pointId, current, destinations) => {
+const createDestinationSelectTemplate = (pointId, pointType, current, destinations) => {
   const options = destinations.reduce((acc, dest) => `${acc}
-    <option value="${dest.name}" data-destination-id="${dest.id}"></option>
+    <option value="${dest.name}"></option>
   `, '');
 
   return `
-    <input class="event__input  event__input--destination" id="event-destination-${pointId}" type="text" name="event-destination" value="${current}" list="destination-list-${pointId}">
-    <datalist id="destination-list-${pointId}">${options}</datalist>
+    <div class="event__field-group event__field-group--destination">
+      <label class="event__label event__type-output" for="event-destination-${pointId}">${pointType}</label>
+     <input class="event__input  event__input--destination" id="event-destination-${pointId}" type="text" name="event-destination" value="${current}" list="destination-list-${pointId}">
+      <datalist id="destination-list-${pointId}">${options}</datalist>
+    </div>
   `;
 };
 
@@ -28,8 +32,8 @@ const createOffersBLockTemplate = (offers, offersIds) => {
   const items = offers.reduce((acc, offer) =>
     `${acc}
       <div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.id}" type="checkbox" name="event-offer-${offer.id}" ${offersIds.includes(offer.id) ? 'checked' : ''} >
-        <label class="event__offer-label" for="event-offer-${offer.id}">
+        <input class="event__offer-checkbox  visually-hidden" id="${offer.id}" type="checkbox" name="event-offer-${offer.id}" ${offersIds.includes(offer.id) ? 'checked' : ''} >
+        <label class="event__offer-label" for="${offer.id}">
           <span class="event__offer-title">${offer.title}</span>
           &plus;&euro;&nbsp;
           <span class="event__offer-price">${offer.price}</span>
@@ -84,27 +88,22 @@ const createPointEditTemplate = (point) => {
             </div>
           </div>
 
-          <div class="event__field-group event__field-group--destination">
-            <label class="event__label event__type-output" for="event-destination-1">
-              ${type.charAt(0).toUpperCase() + type.slice(1)}
-            </label>
-            ${createDestinationSelectTemplate(pointId, pointDestination?.name, destinations)}
-          </div>
+          ${createDestinationSelectTemplate(pointId, type, pointDestination?.name, destinations)}
 
           <div class="event__field-group event__field-group--time">
-            <label class="visually-hidden" for="event-start-time-1">From</label>
-            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${formatFullTime(dateFrom)}">
+            <label class="visually-hidden" for="event-start-time-${pointId}">From</label>
+            <input class="event__input  event__input--time" id="event-start-time-${pointId}" type="text" name="event-start-time" value="${formatFullTime(dateFrom)}">
             &mdash;
-            <label class="visually-hidden" for="event-end-time-1">To</label>
-            <input class="event__input event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${formatFullTime(dateTo)}">
+            <label class="visually-hidden" for="event-end-time-${pointId}">To</label>
+            <input class="event__input event__input--time" id="event-end-time-${pointId}" type="text" name="event-end-time" value="${formatFullTime(dateTo)}">
           </div>
 
           <div class="event__field-group event__field-group--price">
-            <label class="event__label" for="event-price-1">
+            <label class="event__label" for="event-price-${pointId}">
               <span class="visually-hidden">Price</span>
               &euro;
             </label>
-            <input class="event__input event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}">
+            <input class="event__input event__input--price" id="event-price-${pointId}" type="text" name="event-price" value="${basePrice}">
           </div>
 
           <button class="event__save-btn btn btn--blue" type="submit">Save</button>
@@ -133,26 +132,15 @@ export default class PointEditView extends AbstractStatefulView {
     this.#setInnerHandlers();
   }
 
-  setSubmitFormHandler(callback) {
-    this._callback.submit = callback;
-    this.element.querySelector('form').addEventListener('submit', this.#submitHandler);
-  }
-
-  setCloseFormHandler(callback) {
-    this._callback.close = callback;
-    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#closeHandler);
-  }
-
   #setInnerHandlers = () => {
     this.element.querySelectorAll('.event__type-input').forEach((input) => {
       input.addEventListener('change', this.#changeTypeHandler);
     });
-  };
-
-  _restoreHandlers = () => {
-    this.#setInnerHandlers();
-    this.setSubmitFormHandler(this._callback.submit);
-    this.setCloseFormHandler(this._callback.close);
+    this.element.querySelectorAll('.event__offer-checkbox').forEach((input) => {
+      input.addEventListener('change', this.#changeOfferHandler);
+    });
+    this.element.querySelector('.event__input--price').addEventListener('change', this.#changePriceHandler);
+    this.element.querySelector('.event__input--destination').addEventListener('change', this.#changeDestinationHandler);
   };
 
   #submitHandler = (evt) => {
@@ -164,16 +152,49 @@ export default class PointEditView extends AbstractStatefulView {
     this._callback.close();
   };
 
-  #changeTypeHandler = ({target}) => {
+  #changePriceHandler = ({target: {value}}) => {
     this.updateElement({
-      type: target.value,
-      offers: [],
-      offersByType: this.#offers.find((o) => o.type === target.value).offers,
+      basePrice: value,
     });
   };
 
-  get template() {
-    return createPointEditTemplate(this._state);
+  #changeOfferHandler = ({target: {id, checked}}) => {
+    const offers = [...this._state.offers];
+    const index = offers.findIndex((o) => o === id);
+    if (checked) {
+      offers.push(id);
+    } else {
+      offers.splice(index, 1);
+    }
+    this.updateElement({
+      offers,
+    });
+  };
+
+  #changeTypeHandler = ({target: {value}}) => {
+    this.updateElement({
+      type: value,
+      offers: [],
+      offersByType: this.#offers.find((o) => o.type === value).offers,
+    });
+  };
+
+  #changeDestinationHandler = ({target: {value}}) => {
+    const selected = this.#destinations.find((d) => d.name === value);
+    this.updateElement({
+      destination: selected?.id || '',
+      pointDestination: selected,
+    });
+  };
+
+  setSubmitFormHandler(callback) {
+    this._callback.submit = callback;
+    this.element.querySelector('form').addEventListener('submit', this.#submitHandler);
+  }
+
+  setCloseFormHandler(callback) {
+    this._callback.close = callback;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#closeHandler);
   }
 
   reset = (point) => {
@@ -181,6 +202,16 @@ export default class PointEditView extends AbstractStatefulView {
       PointEditView.parsePointToState(point, this.#offers, this.#destinations),
     );
   };
+
+  _restoreHandlers = () => {
+    this.#setInnerHandlers();
+    this.setSubmitFormHandler(this._callback.submit);
+    this.setCloseFormHandler(this._callback.close);
+  };
+
+  get template() {
+    return createPointEditTemplate(this._state);
+  }
 
   static parsePointToState = (point, offers, destinations) => {
     const offersByType = offers.find((o) => o.type === point.type).offers;

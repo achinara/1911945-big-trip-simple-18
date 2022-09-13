@@ -1,3 +1,10 @@
+const capitalize = (str) => {
+  if (!str || typeof str !== 'string') {
+    return '';
+  }
+  return str.charAt(0).toUpperCase() + str.slice(1);
+};
+
 const updateItem = (items, update) => {
   const index = items.findIndex((item) => item.id === update.id);
 
@@ -12,5 +19,5 @@ const updateItem = (items, update) => {
   ];
 };
 
-export {updateItem};
+export {updateItem, capitalize};
 
