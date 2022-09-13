@@ -16,7 +16,7 @@ export default class BoardPresenter {
 
   #points = [];
   #pointPresenter = new Map();
-  #pointsSortedByDate = [];
+  #sortedPointsByDate = [];
 
   #currentSortType = SortType.DEFAULT;
 
@@ -26,8 +26,8 @@ export default class BoardPresenter {
   }
 
   init = () => {
-    this.#pointsSortedByDate = [...this.#pointModel.points].sort(sortByDate);
-    this.#points = [...this.#pointsSortedByDate];
+    this.#sortedPointsByDate = [...this.#pointModel.points].sort(sortByDate);
+    this.#points = [...this.#sortedPointsByDate];
     this.#renderContent();
   };
 
@@ -37,7 +37,7 @@ export default class BoardPresenter {
 
   #handlePointChange = (updatedPoint) => {
     this.#points = updateItem(this.#points, updatedPoint);
-    this.#pointsSortedByDate = updateItem(this.#pointsSortedByDate, updatedPoint);
+    this.#sortedPointsByDate = updateItem(this.#sortedPointsByDate, updatedPoint);
     this.#pointPresenter.get(updatedPoint.id).init(updatedPoint);
   };
 
@@ -49,7 +49,7 @@ export default class BoardPresenter {
     if (sortType === SortType.PRICE) {
       this.#points.sort(sortByPrice);
     } else {
-      this.#points = [...this.#pointsSortedByDate];
+      this.#points = [...this.#sortedPointsByDate];
     }
 
     this.#currentSortType = sortType;

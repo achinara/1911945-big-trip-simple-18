@@ -125,22 +125,22 @@ export default class PointEditView extends AbstractStatefulView {
   #destinations = null;
   #offers = null;
 
-  constructor(pointEdit = {}, destinations, offers) {
+  constructor(point = {}, destinations, offers) {
     super();
     this.#offers = offers;
     this.#destinations = destinations;
-    this._state = PointEditView.parsePointToState(pointEdit, this.#offers, this.#destinations);
+    this._state = PointEditView.parsePointToState(point, this.#offers, this.#destinations);
     this.#setInnerHandlers();
   }
 
   setSubmitFormHandler(callback) {
     this._callback.submit = callback;
-    this.element.querySelector('form').addEventListener('submit', this.#submit);
+    this.element.querySelector('form').addEventListener('submit', this.#submitHandler);
   }
 
   setCloseFormHandler(callback) {
     this._callback.close = callback;
-    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#close);
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#closeHandler);
   }
 
   #setInnerHandlers = () => {
@@ -155,12 +155,12 @@ export default class PointEditView extends AbstractStatefulView {
     this.setCloseFormHandler(this._callback.close);
   };
 
-  #submit = (evt) => {
+  #submitHandler = (evt) => {
     evt.preventDefault();
     this._callback.submit(PointEditView.parseStateToPoint(this._state));
   };
 
-  #close = () => {
+  #closeHandler = () => {
     this._callback.close();
   };
 
