@@ -4,6 +4,7 @@ import SortView from '../view/sort-view';
 import PointPresenter from './point-presenter';
 import {render} from '../framework/render';
 import {sortByDate, sortByPrice} from '../utils/sort';
+import {updateItem} from '../utils/common';
 import {SortType} from '../const';
 
 export default class BoardPresenter {
@@ -15,8 +16,7 @@ export default class BoardPresenter {
 
   #points = [];
   #pointPresenter = new Map();
-  #initialPoints = [];
-  #pointsSortedByDate = [];
+  #sortedPointsByDate = [];
 
   #currentSortType = SortType.DEFAULT;
 
@@ -26,14 +26,19 @@ export default class BoardPresenter {
   }
 
   init = () => {
-    this.#initialPoints = [...this.#pointModel.points];
-    this.#pointsSortedByDate = this.#initialPoints.sort(sortByDate);
-    this.#points = [...this.#pointsSortedByDate];
+    this.#sortedPointsByDate = [...this.#pointModel.points].sort(sortByDate);
+    this.#points = [...this.#sortedPointsByDate];
     this.#renderContent();
   };
 
   #handleModeChange = () => {
     this.#pointPresenter.forEach((presenter) => presenter.resetView());
+  };
+
+  #handlePointChange = (updatedPoint) => {
+    this.#points = updateItem(this.#points, updatedPoint);
+    this.#sortedPointsByDate = updateItem(this.#sortedPointsByDate, updatedPoint);
+    this.#pointPresenter.get(updatedPoint.id).init(updatedPoint);
   };
 
   #handleSortChange = (sortType) => {
@@ -44,7 +49,7 @@ export default class BoardPresenter {
     if (sortType === SortType.PRICE) {
       this.#points.sort(sortByPrice);
     } else {
-      this.#points = [...this.#pointsSortedByDate];
+      this.#points = [...this.#sortedPointsByDate];
     }
 
     this.#currentSortType = sortType;
@@ -55,7 +60,7 @@ export default class BoardPresenter {
   #renderPoint = (point) => {
     const destinations = this.#pointModel.destinations;
     const offers = this.#pointModel.offers;
-    const pointPresenter = new PointPresenter(this.#pointListComponent.element, offers, destinations, this.#handleModeChange);
+    const pointPresenter = new PointPresenter(this.#pointListComponent.element, offers, destinations, this.#handlePointChange, this.#handleModeChange);
     pointPresenter.init(point);
 
     this.#pointPresenter.set(point.id, pointPresenter);

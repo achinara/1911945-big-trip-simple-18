@@ -45,13 +45,20 @@ const createPointTemplate = (point) => {
 };
 
 export default class PointView extends AbstractView {
-  constructor(point) {
+  #point = null;
+
+  constructor(point, destinations, offers) {
     super();
-    this.point = point;
+    const offersByType = offers.find((o) => o.type === point.type).offers;
+    this.#point = {
+      ...point,
+      destination: destinations.find((d) => d.id === point.destination),
+      offers: offersByType.filter(({id}) => point.offers.includes(id)),
+    };
   }
 
   get template() {
-    return createPointTemplate(this.point);
+    return createPointTemplate(this.#point);
   }
 
   setClickHandler = (callback) => {

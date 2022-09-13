@@ -9,6 +9,7 @@ const Mode = {
 
 export default class PointPresenter {
   #pointListContainer = null;
+  #changeData = null;
   #changeMode = null;
 
   #pointComponent = null;
@@ -19,10 +20,11 @@ export default class PointPresenter {
   #destinations = null;
   #mode = Mode.DEFAULT;
 
-  constructor(container, offers, destinations, changeMode) {
+  constructor(container, offers, destinations, changeData, changeMode) {
     this.#offers = offers;
     this.#destinations = destinations;
     this.#pointListContainer = container;
+    this.#changeData = changeData;
     this.#changeMode = changeMode;
   }
 
@@ -39,11 +41,15 @@ export default class PointPresenter {
     this.#mode = Mode.DEFAULT;
   };
 
+  #resetPointEdit = () => {
+    this.#pointEditComponent.reset(this.#point);
+  };
+
   #escKeyDownHandler = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
+      this.#resetPointEdit();
       this.#replaceFormToPoint();
-      this.#removeEventEscDown();
     }
   };
 
@@ -55,8 +61,19 @@ export default class PointPresenter {
     document.removeEventListener('keydown', this.#escKeyDownHandler);
   };
 
+  #handleFormSubmit = (point) => {
+    this.#changeData(point);
+    this.#replaceFormToPoint();
+  };
+
+  #handleCloseForm = () => {
+    this.#resetPointEdit();
+    this.#replaceFormToPoint();
+  };
+
   resetView = () => {
     if (this.#mode !== Mode.DEFAULT) {
+      this.#resetPointEdit();
       this.#replaceFormToPoint();
     }
   };
@@ -71,12 +88,12 @@ export default class PointPresenter {
     const prevPointComponent = this.#pointComponent;
     const prevPointEditComponent = this.#pointEditComponent;
 
-    this.#pointComponent = new PointView(point);
+    this.#pointComponent = new PointView(point, this.#destinations, this.#offers);
     this.#pointEditComponent = new PointEditView(point, this.#destinations, this.#offers);
 
     this.#pointComponent.setClickHandler(this.#replacePointToForm);
-    this.#pointEditComponent.setSubmitFormHandler(this.#replaceFormToPoint);
-    this.#pointEditComponent.setCloseFormHandler(this.#replaceFormToPoint);
+    this.#pointEditComponent.setSubmitFormHandler(this.#handleFormSubmit);
+    this.#pointEditComponent.setCloseFormHandler(this.#handleCloseForm);
 
     if (prevPointComponent === null || prevPointEditComponent === null) {
       render(this.#pointComponent, this.#pointListContainer);

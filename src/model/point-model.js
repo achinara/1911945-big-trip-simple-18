@@ -24,6 +24,6 @@ export default class PointModel {
   }
 
   get points() {
-    return this.#normalizedPoints;
+    return this.#points;
   }
 }
