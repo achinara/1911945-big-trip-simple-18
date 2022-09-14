@@ -1,7 +1,8 @@
+import flatpickr from 'flatpickr';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view';
 import {capitalize} from '../utils/common';
-
 import {formatFullTime} from '../utils/format-date';
+import 'flatpickr/dist/flatpickr.min.css';
 
 const createTypesSelectTemplate = (pointId, active, types) => types.reduce((acc, type) =>
   `${acc}
@@ -123,6 +124,8 @@ const createPointEditTemplate = (point) => {
 export default class PointEditView extends AbstractStatefulView {
   #destinations = null;
   #offers = null;
+  #datepickerFrom = null;
+  #datepickerTo = null;
 
   constructor(point = {}, destinations, offers) {
     super();
@@ -130,6 +133,7 @@ export default class PointEditView extends AbstractStatefulView {
     this.#destinations = destinations;
     this._state = PointEditView.parsePointToState(point, this.#offers, this.#destinations);
     this.#setInnerHandlers();
+    this.#setDatepicker();
   }
 
   #setInnerHandlers = () => {
@@ -187,6 +191,41 @@ export default class PointEditView extends AbstractStatefulView {
     });
   };
 
+  #changeDateFromHandler = ([userDate]) => {
+    this.updateElement({
+      dateFrom: userDate,
+    });
+  };
+
+  #changeDateToHandler = ([userDate]) => {
+    this.updateElement({
+      dateTo: userDate,
+    });
+  };
+
+  #setDatepicker = () => {
+    const {id, dateFrom, dateTo} = this._state;
+    this.#datepickerFrom = flatpickr(
+      this.element.querySelector(`#event-start-time-${id}`),
+      {
+        enableTime: true,
+        dateFormat: 'Y/m/d H:i',
+        defaultDate: dateFrom,
+        onChange: this.#changeDateFromHandler,
+      },
+    );
+
+    this.#datepickerTo = flatpickr(
+      this.element.querySelector(`#event-end-time-${id}`),
+      {
+        enableTime: true,
+        dateFormat: 'Y/m/d H:i',
+        defaultDate: dateTo,
+        onChange: this.#changeDateToHandler,
+      },
+    );
+  };
+
   setSubmitFormHandler(callback) {
     this._callback.submit = callback;
     this.element.querySelector('form').addEventListener('submit', this.#submitHandler);
@@ -197,6 +236,20 @@ export default class PointEditView extends AbstractStatefulView {
     this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#closeHandler);
   }
 
+  removeElement = () => {
+    super.removeElement();
+
+    if (this.#datepickerFrom) {
+      this.#datepickerFrom.destroy();
+      this.#datepickerFrom = null;
+    }
+
+    if (this.#datepickerTo) {
+      this.#datepickerTo.destroy();
+      this.#datepickerTo = null;
+    }
+  };
+
   reset = (point) => {
     this.updateElement(
       PointEditView.parsePointToState(point, this.#offers, this.#destinations),
@@ -205,6 +258,7 @@ export default class PointEditView extends AbstractStatefulView {
 
   _restoreHandlers = () => {
     this.#setInnerHandlers();
+    this.#setDatepicker();
     this.setSubmitFormHandler(this._callback.submit);
     this.setCloseFormHandler(this._callback.close);
   };
