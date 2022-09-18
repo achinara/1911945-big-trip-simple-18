@@ -7,8 +7,12 @@ const capitalize = (str) => {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
-const isFuturePoint = (date) => date && (dayjs().isAfter(date, 'D') || dayjs().isSame(date, 'D'));
-const isActivePoint = (dateTo) => dateTo && dayjs().isAfter(dateTo, 'D');
+const isFuturePoint = (date) => {
+  console.log(date, dayjs().isBefore(date, 'day'), dayjs().isSame(date, 'day'));
+  return date && (dayjs().isBefore(date, 'day') || dayjs().isSame(date, 'day'));
+};
+
+const isActivePoint = (dateTo) => dateTo && dayjs().isBefore(dateTo, 'day');
 
 export {capitalize, isFuturePoint, isActivePoint};
 

@@ -4,36 +4,43 @@ import SortView from '../view/sort-view';
 import PointPresenter from './point-presenter';
 import {render, remove} from '../framework/render';
 import {sortByDate, sortByPrice} from '../utils/sort';
+import {filter} from '../utils/filter.js';
 import {SortType, UpdateType, UserAction} from '../const';
 
 export default class BoardPresenter {
   #pointListComponent = new PointListView();
-  #noPoints = new NoPoints();
+  #noPoints = null;
   #tripContainer = null;
   #sortComponent = null;
 
   #destinationModel = null;
   #offersModel = null;
   #pointModel = null;
+  #filterModel = null;
 
   #pointPresenter = new Map();
 
   #currentSortType = SortType.DEFAULT;
 
-  constructor(container, pointModel, offersModel, destinationModel) {
+  constructor(container, pointModel, offersModel, destinationModel, filterModel) {
     this.#tripContainer = container;
     this.#pointModel = pointModel;
+    this.#filterModel = filterModel;
     this.#offersModel = offersModel;
     this.#destinationModel = destinationModel;
 
     this.#pointModel.addObserver(this.#handleModelEvent);
+    this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
   get points() {
+    const filterType = this.#filterModel.filter;
+    const points = this.#pointModel.points;
+    const filteredPoints = filter[filterType](points);
     if (this.#currentSortType === SortType.PRICE) {
-      return [...this.#pointModel.points].sort(sortByPrice);
+      return filteredPoints.sort(sortByPrice);
     }
-    return [...this.#pointModel.points].sort(sortByDate);
+    return filteredPoints.sort(sortByDate);
   }
 
   init = () => {
@@ -100,6 +107,7 @@ export default class BoardPresenter {
   };
 
   #renderNoPoints = () => {
+    this.#noPoints = new NoPoints(this.#filterModel.filter);
     render(this.#noPoints, this.#tripContainer);
   };
 
@@ -116,7 +124,10 @@ export default class BoardPresenter {
     this.#pointPresenter.clear();
 
     remove(this.#sortComponent);
-    remove(this.#noPoints);
+
+    if (this.#noPoints) {
+      remove(this.#noPoints);
+    }
 
     if (resetSortType) {
       this.#currentSortType = SortType.DEFAULT;

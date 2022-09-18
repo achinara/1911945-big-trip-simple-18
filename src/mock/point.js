@@ -4,7 +4,7 @@ import {generateOffersByType} from './offers';
 import {generateDestinations} from './destination';
 import {POINT_TYPES, PRICES} from './const';
 
-const COUNT_POINTS = 4;
+const COUNT_POINTS = 10;
 
 const generatePoint = () => {
   const type = getRandomValueFromArray(POINT_TYPES);
@@ -14,8 +14,8 @@ const generatePoint = () => {
 
   return {
     basePrice: getRandomValueFromArray(PRICES),
-    dateFrom: `2019-0${getRandomInteger(1, 6)}-10T22:55:56.845Z`,
-    dateTo: '2019-07-11T09:22:13.375Z',
+    dateFrom: `2022-0${getRandomInteger(8, 9)}-20T22:55:56.845Z`,
+    dateTo: `2022-0${getRandomInteger(8, 9)}-11T09:22:13.375Z`,
     destination: getRandomValueFromArray(destinations).id,
     id: uniqid(),
     offers,

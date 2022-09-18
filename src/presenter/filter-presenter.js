@@ -5,16 +5,12 @@ import {FilterType, UpdateType} from '../const.js';
 export default class FilterPresenter {
   #filterContainer = null;
   #filterModel = null;
-  #pointModel = null;
 
   #filterComponent = null;
 
-  constructor(filterContainer, filterModel, pointModel) {
+  constructor(filterContainer, filterModel) {
     this.#filterContainer = filterContainer;
     this.#filterModel = filterModel;
-    this.#pointModel = pointModel;
-
-    this.#pointModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
   }
 

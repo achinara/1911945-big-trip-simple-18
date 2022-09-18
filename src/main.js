@@ -1,4 +1,3 @@
-import FilterView from './view/filter-view';
 import NewPointButtonView from './view/new-point-button-view';
 import BoardPresenter from './presenter/board-presenter';
 import FilterPresenter from './presenter/filter-presenter.js';
@@ -16,8 +15,8 @@ const destinationModel = new DestinationModel();
 const offersModel = new OffersModel();
 const pointModel = new PointModel();
 const filterModel = new FilterModel();
-const filterPresenter = new FilterPresenter(filterContainer, filterModel, pointModel);
-const tripPresenter = new BoardPresenter(tripContainer, pointModel, offersModel, destinationModel);
+const filterPresenter = new FilterPresenter(filterContainer, filterModel);
+const tripPresenter = new BoardPresenter(tripContainer, pointModel, offersModel, destinationModel, filterModel);
 
 render(new NewPointButtonView(), tripMain);
 
