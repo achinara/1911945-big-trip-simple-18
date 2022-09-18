@@ -3,6 +3,11 @@ const SortType = {
   PRICE: 'price',
 };
 
+const FilterType = {
+  EVERYTHING: 'everything',
+  FUTURE: 'future',
+};
+
 const UserAction = {
   UPDATE_POINT: 'UPDATE_POINT',
   ADD_POINT: 'ADD_POINT',
@@ -15,4 +20,4 @@ const UpdateType = {
   MAJOR: 'MAJOR',
 };
 
-export {SortType, UserAction, UpdateType};
+export {FilterType, SortType, UserAction, UpdateType};
