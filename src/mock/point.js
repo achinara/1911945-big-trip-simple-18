@@ -4,7 +4,7 @@ import {generateOffersByType} from './offers';
 import {generateDestinations} from './destination';
 import {POINT_TYPES, PRICES} from './const';
 
-const COUNT_POINTS = 10;
+const COUNT_POINTS = 4;
 
 const generatePoint = () => {
   const type = getRandomValueFromArray(POINT_TYPES);

@@ -1,8 +1,20 @@
 import flatpickr from 'flatpickr';
+import dayjs from 'dayjs';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view';
 import {capitalize} from '../utils/common';
+import {POINT_TYPES} from '../const';
 import {formatFullTime} from '../utils/format-date';
 import 'flatpickr/dist/flatpickr.min.css';
+
+const BLANK_POINT = {
+  basePrice: '',
+  dateFrom: dayjs(),
+  dateTo: dayjs().add(1, 'd'),
+  destination: '',
+  id: null,
+  offers: [],
+  type: POINT_TYPES[0],
+};
 
 const createTypesSelectTemplate = (pointId, active, types) => types.reduce((acc, type) =>
   `${acc}
@@ -12,7 +24,7 @@ const createTypesSelectTemplate = (pointId, active, types) => types.reduce((acc,
       </div>
     `, '');
 
-const createDestinationSelectTemplate = (pointId, pointType, current, destinations) => {
+const createDestinationSelectTemplate = (pointId, pointType, current = '', destinations) => {
   const options = destinations.reduce((acc, dest) => `${acc}
     <option value="${dest.name}"></option>
   `, '');
@@ -68,8 +80,14 @@ const createDestinationBlockTemplate = (destination) => {
     </section>`;
 };
 
-const createPointEditTemplate = (point) => {
-  const {id: pointId, basePrice, dateFrom, dateTo, offers, pointDestination, type, destinations, types, offersByType} = point;
+const createCloseBtn = () => `
+  <button class="event__rollup-btn" type="button">
+    <span class="visually-hidden">Open event</span>
+  </button>
+`;
+
+const createPointEditTemplate = (data) => {
+  const {id: pointId, basePrice, dateFrom, dateTo, offers, pointDestination, type, destinations, types, offersByType, isNewPoint} = data;
   return `
     <li class="trip-events__item">
       <form class="event event--edit" action="#" method="post">
@@ -104,14 +122,12 @@ const createPointEditTemplate = (point) => {
               <span class="visually-hidden">Price</span>
               &euro;
             </label>
-            <input class="event__input event__input--price" id="event-price-${pointId}" type="text" name="event-price" value="${basePrice}">
+            <input class="event__input event__input--price" id="event-price-${pointId}" type="number" name="event-price" value="${basePrice}">
           </div>
 
           <button class="event__save-btn btn btn--blue" type="submit">Save</button>
-          <button class="event__reset-btn" type="reset">Delete</button>
-          <button class="event__rollup-btn" type="button">
-            <span class="visually-hidden">Open event</span>
-          </button>
+          <button class="event__reset-btn" type="reset">${isNewPoint ? 'Cancel' : 'Delete'}</button>
+          ${isNewPoint ? '' : createCloseBtn()}
         </header>
         <section class="event__details">
           ${createOffersBLockTemplate(offersByType, offers)}
@@ -127,11 +143,12 @@ export default class PointEditView extends AbstractStatefulView {
   #datepickerFrom = null;
   #datepickerTo = null;
 
-  constructor(point = {}, destinations, offers) {
+  constructor(point, destinations, offers) {
     super();
+    const editingPoint = point || BLANK_POINT;
     this.#offers = offers;
     this.#destinations = destinations;
-    this._state = PointEditView.parsePointToState(point, this.#offers, this.#destinations);
+    this._state = PointEditView.parsePointToState(editingPoint, this.#offers, this.#destinations);
     this.#setInnerHandlers();
     this.#setDatepicker();
   }
@@ -237,6 +254,9 @@ export default class PointEditView extends AbstractStatefulView {
   }
 
   setCloseFormHandler(callback) {
+    if (this._state.isNewPoint) {
+      return;
+    }
     this._callback.close = callback;
     this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#closeHandler);
   }
@@ -287,6 +307,7 @@ export default class PointEditView extends AbstractStatefulView {
       pointDestination,
       offersByType,
       types: offers.map((offer) => offer.type),
+      isNewPoint: !point.id,
     };
   };
 
@@ -297,6 +318,7 @@ export default class PointEditView extends AbstractStatefulView {
     delete point.offersByType;
     delete point.types;
     delete point.destinations;
+    delete point.isNewPoint;
     return point;
   };
 }
