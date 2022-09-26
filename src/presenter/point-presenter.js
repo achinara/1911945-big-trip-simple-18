@@ -1,6 +1,7 @@
 import {render, replace, remove} from '../framework/render';
 import PointView from '../view/point-view';
 import PointEditView from '../view/point-edit-view';
+import {UserAction, UpdateType} from '../const.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -62,8 +63,22 @@ export default class PointPresenter {
   };
 
   #handleFormSubmit = (point) => {
-    this.#changeData(point);
+    // todo: добавить логику для минор или патч
+    // todo: если юзер добавил/удалил опцию или выбрал другой дестинейшен, то патч
+    this.#changeData(
+      UserAction.UPDATE_POINT,
+      UpdateType.PATCH,
+      point,
+    );
     this.#replaceFormToPoint();
+  };
+
+  #handleDelete = (point) => {
+    this.#changeData(
+      UserAction.DELETE_POINT,
+      UpdateType.MINOR,
+      point,
+    );
   };
 
   #handleCloseForm = () => {
@@ -94,6 +109,7 @@ export default class PointPresenter {
     this.#pointComponent.setClickHandler(this.#replacePointToForm);
     this.#pointEditComponent.setSubmitFormHandler(this.#handleFormSubmit);
     this.#pointEditComponent.setCloseFormHandler(this.#handleCloseForm);
+    this.#pointEditComponent.setDeleteHandler(this.#handleDelete);
 
     if (prevPointComponent === null || prevPointEditComponent === null) {
       render(this.#pointComponent, this.#pointListContainer);

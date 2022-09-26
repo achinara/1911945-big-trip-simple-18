@@ -1,3 +1,5 @@
+import dayjs from 'dayjs';
+
 const capitalize = (str) => {
   if (!str || typeof str !== 'string') {
     return '';
@@ -5,19 +7,9 @@ const capitalize = (str) => {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
 
-const updateItem = (items, update) => {
-  const index = items.findIndex((item) => item.id === update.id);
+const isFuturePoint = (date) => date && (dayjs().isBefore(date, 'day') || dayjs().isSame(date, 'day'));
 
-  if (index === -1) {
-    return items;
-  }
+const isActivePoint = (dateTo) => dateTo && dayjs().isBefore(dateTo, 'day');
 
-  return [
-    ...items.slice(0, index),
-    update,
-    ...items.slice(index + 1),
-  ];
-};
-
-export {updateItem, capitalize};
+export {capitalize, isFuturePoint, isActivePoint};
 
