@@ -2,7 +2,6 @@ import flatpickr from 'flatpickr';
 import dayjs from 'dayjs';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view';
 import {capitalize} from '../utils/common';
-import {POINT_TYPES} from '../const';
 import {formatFullTime} from '../utils/format-date';
 import 'flatpickr/dist/flatpickr.min.css';
 
@@ -13,7 +12,6 @@ const BLANK_POINT = {
   destination: '',
   id: null,
   offers: [],
-  type: POINT_TYPES[0],
 };
 
 const createTypesSelectTemplate = (pointId, active, types) => types.reduce((acc, type) =>
@@ -111,10 +109,10 @@ const createPointEditTemplate = (data) => {
 
           <div class="event__field-group event__field-group--time">
             <label class="visually-hidden" for="event-start-time-${pointId}">From</label>
-            <input class="event__input  event__input--time" id="event-start-time-${pointId}" type="text" name="event-start-time" value="${formatFullTime(dateFrom)}">
+            <input class="event__input  event__input--time" id="event-start-time-${pointId}" type="text" name="event-start-time" value=${formatFullTime(dateFrom)}>
             &mdash;
             <label class="visually-hidden" for="event-end-time-${pointId}">To</label>
-            <input class="event__input event__input--time" id="event-end-time-${pointId}" type="text" name="event-end-time" value="${formatFullTime(dateTo)}">
+            <input class="event__input event__input--time" id="event-end-time-${pointId}" type="text" name="event-end-time" value=${formatFullTime(dateTo)}>
           </div>
 
           <div class="event__field-group event__field-group--price">
@@ -122,7 +120,7 @@ const createPointEditTemplate = (data) => {
               <span class="visually-hidden">Price</span>
               &euro;
             </label>
-            <input class="event__input event__input--price" id="event-price-${pointId}" type="number" name="event-price" value="${basePrice}">
+            <input class="event__input event__input--price" id="event-price-${pointId}" type="number" min="0" name="event-price" value="${basePrice}">
           </div>
 
           <button class="event__save-btn btn btn--blue" type="submit">Save</button>
@@ -180,10 +178,11 @@ export default class PointEditView extends AbstractStatefulView {
   };
 
   #changeOfferHandler = ({target: {id, checked}}) => {
+    const offerId = Number(id);
     const offers = [...this._state.offers];
-    const index = offers.findIndex((o) => o === id);
+    const index = offers.findIndex((o) => o === offerId);
     if (checked) {
-      offers.push(id);
+      offers.push(offerId);
     } else {
       offers.splice(index, 1);
     }
@@ -301,18 +300,25 @@ export default class PointEditView extends AbstractStatefulView {
   static parsePointToState = (point, offers, destinations) => {
     const offersByType = offers.find((o) => o.type === point.type)?.offers || [];
     const pointDestination = destinations.find((d) => d.id === point.destination);
+    const types = offers.map((offer) => offer.type);
+    const isNewPoint = !point.id;
+
     return {
       ...point,
       destinations,
       pointDestination,
       offersByType,
-      types: offers.map((offer) => offer.type),
-      isNewPoint: !point.id,
+      type: isNewPoint ? types[0] : point.type,
+      types,
+      isNewPoint,
     };
   };
 
   static parseStateToPoint = (state) => {
-    const point = {...state};
+    const point = {
+      ...state,
+      basePrice: Number(state.basePrice),
+    };
 
     delete point.pointDestination;
     delete point.offersByType;

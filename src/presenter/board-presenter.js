@@ -154,9 +154,10 @@ export default class BoardPresenter {
 
   #renderPointList = () => {
     render(this.#pointListComponent, this.#tripContainer);
+    const list = this.points;
 
-    for (let i = 0; i < this.points.length; i++) {
-      this.#renderPoint(this.points[i]);
+    for (let i = 0; i < list.length; i++) {
+      this.#renderPoint(list[i]);
     }
   };
 

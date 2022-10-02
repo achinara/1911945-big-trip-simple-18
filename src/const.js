@@ -1,5 +1,3 @@
-const POINT_TYPES = ['flight', 'taxi', 'bus', 'train', 'ship', 'drive', 'check-in', 'sightseeing', 'restaurant'];
-
 const SortType = {
   DEFAULT: 'default',
   PRICE: 'price',
@@ -23,4 +21,4 @@ const UpdateType = {
   INIT: 'INIT',
 };
 
-export {FilterType, POINT_TYPES, SortType, UserAction, UpdateType};
+export {FilterType, SortType, UserAction, UpdateType};
