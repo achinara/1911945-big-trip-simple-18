@@ -1,8 +1,18 @@
 import flatpickr from 'flatpickr';
+import dayjs from 'dayjs';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view';
 import {capitalize} from '../utils/common';
 import {formatFullTime} from '../utils/format-date';
 import 'flatpickr/dist/flatpickr.min.css';
+
+const BLANK_POINT = {
+  basePrice: '',
+  dateFrom: dayjs(),
+  dateTo: dayjs().add(1, 'd'),
+  destination: '',
+  id: null,
+  offers: [],
+};
 
 const createTypesSelectTemplate = (pointId, active, types) => types.reduce((acc, type) =>
   `${acc}
@@ -12,7 +22,7 @@ const createTypesSelectTemplate = (pointId, active, types) => types.reduce((acc,
       </div>
     `, '');
 
-const createDestinationSelectTemplate = (pointId, pointType, current, destinations) => {
+const createDestinationSelectTemplate = (pointId, pointType, current = '', destinations) => {
   const options = destinations.reduce((acc, dest) => `${acc}
     <option value="${dest.name}"></option>
   `, '');
@@ -68,8 +78,14 @@ const createDestinationBlockTemplate = (destination) => {
     </section>`;
 };
 
-const createPointEditTemplate = (point) => {
-  const {id: pointId, basePrice, dateFrom, dateTo, offers, pointDestination, type, destinations, types, offersByType} = point;
+const createCloseBtn = () => `
+  <button class="event__rollup-btn" type="button">
+    <span class="visually-hidden">Open event</span>
+  </button>
+`;
+
+const createPointEditTemplate = (data) => {
+  const {id: pointId, basePrice, dateFrom, dateTo, offers, pointDestination, type, destinations, types, offersByType, isNewPoint} = data;
   return `
     <li class="trip-events__item">
       <form class="event event--edit" action="#" method="post">
@@ -93,10 +109,10 @@ const createPointEditTemplate = (point) => {
 
           <div class="event__field-group event__field-group--time">
             <label class="visually-hidden" for="event-start-time-${pointId}">From</label>
-            <input class="event__input  event__input--time" id="event-start-time-${pointId}" type="text" name="event-start-time" value="${formatFullTime(dateFrom)}">
+            <input class="event__input  event__input--time" id="event-start-time-${pointId}" type="text" name="event-start-time" value=${formatFullTime(dateFrom)}>
             &mdash;
             <label class="visually-hidden" for="event-end-time-${pointId}">To</label>
-            <input class="event__input event__input--time" id="event-end-time-${pointId}" type="text" name="event-end-time" value="${formatFullTime(dateTo)}">
+            <input class="event__input event__input--time" id="event-end-time-${pointId}" type="text" name="event-end-time" value=${formatFullTime(dateTo)}>
           </div>
 
           <div class="event__field-group event__field-group--price">
@@ -104,14 +120,12 @@ const createPointEditTemplate = (point) => {
               <span class="visually-hidden">Price</span>
               &euro;
             </label>
-            <input class="event__input event__input--price" id="event-price-${pointId}" type="text" name="event-price" value="${basePrice}">
+            <input class="event__input event__input--price" id="event-price-${pointId}" type="number" min="0" name="event-price" value="${basePrice}">
           </div>
 
           <button class="event__save-btn btn btn--blue" type="submit">Save</button>
-          <button class="event__reset-btn" type="reset">Delete</button>
-          <button class="event__rollup-btn" type="button">
-            <span class="visually-hidden">Open event</span>
-          </button>
+          <button class="event__reset-btn" type="reset">${isNewPoint ? 'Cancel' : 'Delete'}</button>
+          ${isNewPoint ? '' : createCloseBtn()}
         </header>
         <section class="event__details">
           ${createOffersBLockTemplate(offersByType, offers)}
@@ -127,11 +141,12 @@ export default class PointEditView extends AbstractStatefulView {
   #datepickerFrom = null;
   #datepickerTo = null;
 
-  constructor(point = {}, destinations, offers) {
+  constructor(point, destinations, offers) {
     super();
+    const editingPoint = point || BLANK_POINT;
     this.#offers = offers;
     this.#destinations = destinations;
-    this._state = PointEditView.parsePointToState(point, this.#offers, this.#destinations);
+    this._state = PointEditView.parsePointToState(editingPoint, this.#offers, this.#destinations);
     this.#setInnerHandlers();
     this.#setDatepicker();
   }
@@ -163,10 +178,11 @@ export default class PointEditView extends AbstractStatefulView {
   };
 
   #changeOfferHandler = ({target: {id, checked}}) => {
+    const offerId = Number(id);
     const offers = [...this._state.offers];
-    const index = offers.findIndex((o) => o === id);
+    const index = offers.findIndex((o) => o === offerId);
     if (checked) {
-      offers.push(id);
+      offers.push(offerId);
     } else {
       offers.splice(index, 1);
     }
@@ -237,6 +253,9 @@ export default class PointEditView extends AbstractStatefulView {
   }
 
   setCloseFormHandler(callback) {
+    if (this._state.isNewPoint) {
+      return;
+    }
     this._callback.close = callback;
     this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#closeHandler);
   }
@@ -279,24 +298,33 @@ export default class PointEditView extends AbstractStatefulView {
   }
 
   static parsePointToState = (point, offers, destinations) => {
-    const offersByType = offers.find((o) => o.type === point.type).offers;
+    const offersByType = offers.find((o) => o.type === point.type)?.offers || [];
     const pointDestination = destinations.find((d) => d.id === point.destination);
+    const types = offers.map((offer) => offer.type);
+    const isNewPoint = !point.id;
+
     return {
       ...point,
       destinations,
       pointDestination,
       offersByType,
-      types: offers.map((offer) => offer.type),
+      type: isNewPoint ? types[0] : point.type,
+      types,
+      isNewPoint,
     };
   };
 
   static parseStateToPoint = (state) => {
-    const point = {...state};
+    const point = {
+      ...state,
+      basePrice: Number(state.basePrice),
+    };
 
     delete point.pointDestination;
     delete point.offersByType;
     delete point.types;
     delete point.destinations;
+    delete point.isNewPoint;
     return point;
   };
 }

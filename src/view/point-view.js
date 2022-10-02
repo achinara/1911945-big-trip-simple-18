@@ -15,7 +15,7 @@ const createOffersTemplate = (offers) => {
 };
 
 const createPointTemplate = (point) => {
-  const {type, basePrice, dateFrom, dateTo, destination, offers} = point;
+  const {type, basePrice = '', dateFrom, dateTo, destination, offers} = point;
   return (
     `<li class="trip-events__item">
       <div class="event">
@@ -23,7 +23,7 @@ const createPointTemplate = (point) => {
         <div class="event__type">
           <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
         </div>
-        <h3 class="event__title">${type} ${destination.name}</h3>
+        <h3 class="event__title">${type} ${destination?.name || ''}</h3>
         <div class="event__schedule">
           <p class="event__time">
             <time class="event__start-time" datetime="${dateFrom}">${formatHourAndMinute(dateFrom)}</time>
@@ -49,7 +49,7 @@ export default class PointView extends AbstractView {
 
   constructor(point, destinations, offers) {
     super();
-    const offersByType = offers.find((o) => o.type === point.type).offers;
+    const offersByType = offers.find((o) => o.type === point.type)?.offers || [];
     this.#point = {
       ...point,
       destination: destinations.find((d) => d.id === point.destination),
