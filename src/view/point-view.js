@@ -49,7 +49,7 @@ export default class PointView extends AbstractView {
 
   constructor(point, destinations, offers) {
     super();
-    const offersByType = offers.find((o) => o.type === point.type).offers;
+    const offersByType = offers.find((o) => o.type === point.type)?.offers || [];
     this.#point = {
       ...point,
       destination: destinations.find((d) => d.id === point.destination),

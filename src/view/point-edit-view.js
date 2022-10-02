@@ -299,7 +299,7 @@ export default class PointEditView extends AbstractStatefulView {
   }
 
   static parsePointToState = (point, offers, destinations) => {
-    const offersByType = offers.find((o) => o.type === point.type).offers;
+    const offersByType = offers.find((o) => o.type === point.type)?.offers || [];
     const pointDestination = destinations.find((d) => d.id === point.destination);
     return {
       ...point,
