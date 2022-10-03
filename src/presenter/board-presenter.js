@@ -69,6 +69,9 @@ export default class BoardPresenter {
   };
 
   createPoint = (callback) => {
+    if (!this.points.length) {
+      this.#renderPointList();
+    }
     this.#currentSortType = SortType.DEFAULT;
     this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
     this.#pointNewPresenter.init(callback);
