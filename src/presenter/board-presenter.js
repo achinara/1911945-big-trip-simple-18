@@ -69,11 +69,14 @@ export default class BoardPresenter {
   };
 
   createPoint = (callback) => {
-    if (!this.points.length) {
-      this.#renderPointList();
-    }
     this.#currentSortType = SortType.DEFAULT;
     this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+    const points = this.points || [];
+
+    if (!points.length) {
+      this.#clearNoPoints();
+      this.#renderPointList();
+    }
     this.#pointNewPresenter.init(callback);
   };
 
@@ -164,6 +167,12 @@ export default class BoardPresenter {
     }
   };
 
+  #clearNoPoints = () => {
+    if (this.#noPoints) {
+      remove(this.#noPoints);
+    }
+  };
+
   #clearContent = ({resetSortType = false} = {}) => {
     this.#pointNewPresenter.destroy();
     this.#pointPresenter.forEach((presenter) => presenter.destroy());
@@ -172,9 +181,7 @@ export default class BoardPresenter {
     remove(this.#sortComponent);
     remove(this.#loadingComponent);
 
-    if (this.#noPoints) {
-      remove(this.#noPoints);
-    }
+    this.#clearNoPoints();
 
     if (resetSortType) {
       this.#currentSortType = SortType.DEFAULT;
