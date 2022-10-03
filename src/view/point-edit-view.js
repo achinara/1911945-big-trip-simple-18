@@ -6,7 +6,7 @@ import {formatFullTime} from '../utils/format-date';
 import 'flatpickr/dist/flatpickr.min.css';
 
 const BLANK_POINT = {
-  basePrice: '',
+  basePrice: 5,
   dateFrom: dayjs(),
   dateTo: dayjs().add(1, 'd'),
   destination: '',
@@ -120,7 +120,7 @@ const createPointEditTemplate = (data) => {
               <span class="visually-hidden">Price</span>
               &euro;
             </label>
-            <input class="event__input event__input--price" id="event-price-${pointId}" type="number" min="0" name="event-price" value="${basePrice}">
+            <input class="event__input event__input--price" id="event-price-${pointId}" type="number" min="1" name="event-price" value="${basePrice}">
           </div>
 
           <button class="event__save-btn btn btn--blue" type="submit">Save</button>
@@ -225,7 +225,7 @@ export default class PointEditView extends AbstractStatefulView {
       this.element.querySelector(`#event-start-time-${id}`),
       {
         enableTime: true,
-        dateFormat: 'Y/m/d H:i',
+        dateFormat: 'd/m/y H:i',
         defaultDate: dateFrom,
         onChange: this.#changeDateFromHandler,
       },
@@ -235,7 +235,7 @@ export default class PointEditView extends AbstractStatefulView {
       this.element.querySelector(`#event-end-time-${id}`),
       {
         enableTime: true,
-        dateFormat: 'Y/m/d H:i',
+        dateFormat: 'd/m/y H:i',
         defaultDate: dateTo,
         onChange: this.#changeDateToHandler,
       },

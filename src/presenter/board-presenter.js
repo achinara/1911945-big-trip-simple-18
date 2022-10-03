@@ -37,8 +37,8 @@ export default class BoardPresenter {
     this.#loadingComponent = new LoadingView();
     this.#pointNewPresenter = new PointNewPresenter(
       this.#pointListComponent.element,
-      this.offers,
-      this.destinations,
+      this.#offersModel,
+      this.#destinationModel,
       this.#handleViewAction
     );
 
