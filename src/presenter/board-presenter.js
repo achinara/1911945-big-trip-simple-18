@@ -4,6 +4,7 @@ import NoPoints from '../view/no-points';
 import PointListView from '../view/point-list-view';
 import SortView from '../view/sort-view';
 import LoadingView from '../view/loading-view';
+import ErrorView from '../view/error-view';
 import PointPresenter from './point-presenter';
 import PointNewPresenter from './point-new-presenter';
 import {sortByDate, sortByPrice} from '../utils/sort';
@@ -21,6 +22,7 @@ export default class BoardPresenter {
   #tripContainer = null;
   #sortComponent = null;
   #loadingComponent = null;
+  #errorComponent = null;
 
   #destinationModel = null;
   #offersModel = null;
@@ -32,6 +34,8 @@ export default class BoardPresenter {
 
   #currentSortType = SortType.DEFAULT;
   #isLoading = true;
+  #isError = false;
+  #errorMessage = '';
   #uiBlocker = new UiBlocker(TimeLimit.LOWER_LIMIT, TimeLimit.UPPER_LIMIT);
 
   constructor(container, pointModel, offersModel, destinationModel, filterModel) {
@@ -141,6 +145,13 @@ export default class BoardPresenter {
         remove(this.#loadingComponent);
         this.#renderContent();
         break;
+      case UpdateType.ERROR:
+        this.#isLoading = false;
+        this.#isError = true;
+        this.#errorMessage = data?.message;
+        remove(this.#loadingComponent);
+        this.#renderContent();
+        break;
     }
   };
 
@@ -171,6 +182,12 @@ export default class BoardPresenter {
     this.#sortComponent = new SortView(this.#currentSortType);
     this.#sortComponent.setSortChangeHandler(this.#handleSortChange);
     render(this.#sortComponent, this.#tripContainer);
+  };
+
+  #renderError = () => {
+    this.#errorComponent = new ErrorView(this.#errorMessage);
+    this.#errorMessage = '';
+    render(this.#errorComponent, this.#tripContainer, RenderPosition.AFTERBEGIN);
   };
 
   #renderLoading = () => {
@@ -204,6 +221,7 @@ export default class BoardPresenter {
 
     remove(this.#sortComponent);
     remove(this.#loadingComponent);
+    remove(this.#errorComponent);
 
     this.#clearNoPoints();
 
@@ -213,6 +231,11 @@ export default class BoardPresenter {
   };
 
   #renderContent = () => {
+    if (this.#isError) {
+      this.#renderError();
+      return;
+    }
+
     if (this.#isLoading) {
       this.#renderLoading();
       return;

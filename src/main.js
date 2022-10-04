@@ -34,13 +34,13 @@ const handleNewPointButtonClick = () => {
   newPointButtonComponent.element.disabled = true;
 };
 
-filterPresenter.init();
 boardPresenter.init();
 
 offersModel.init()
   .finally(destinationModel.init)
   .finally(pointModel.init)
-  .finally(() => {
+  .then(() => {
+    filterPresenter.init();
     render(newPointButtonComponent, tripMain);
     newPointButtonComponent.setClickHandler(handleNewPointButtonClick);
   });
