@@ -98,8 +98,6 @@ export default class PointPresenter {
   };
 
   #handleFormSubmit = (point) => {
-    // todo: добавить логику для минор или патч
-    // todo: если юзер добавил/удалил опцию или выбрал другой дестинейшен, то патч
     this.#changeData(
       UserAction.UPDATE_POINT,
       UpdateType.PATCH,
