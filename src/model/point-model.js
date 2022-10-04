@@ -20,7 +20,6 @@ export default class PointModel extends Observable {
       this.#points = points.map(this.#adaptToClient);
     } catch (err) {
       this.#points = [];
-      throw Error(err.message);
     }
 
     this._notify(UpdateType.INIT);

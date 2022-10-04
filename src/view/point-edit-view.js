@@ -78,11 +78,16 @@ const createDestinationBlockTemplate = (destination) => {
     </section>`;
 };
 
-const createCloseBtnTemplate = () => `
-  <button class="event__rollup-btn" type="button">
-    <span class="visually-hidden">Open event</span>
-  </button>
-`;
+const createCloseBtnTemplate = (isNewPoint) => {
+  if (isNewPoint) {
+    return '';
+  }
+  return `
+    <button class="event__rollup-btn" type="button">
+      <span class="visually-hidden">Open event</span>
+    </button>
+  `;
+};
 
 const createCancelBtnTemplate = (isNewPoint, isDeleting, isDisabled) => {
   if (isNewPoint) {
@@ -147,10 +152,10 @@ const createPointEditTemplate = (data) => {
 
           <button class="event__save-btn btn btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>${isSaving ? 'Saving...' : 'Save'}</button>
           ${createCancelBtnTemplate(isNewPoint, isDeleting, isDisabled)}
-          ${isNewPoint ? '' : createCloseBtnTemplate()}
+          ${createCloseBtnTemplate(isNewPoint)}
         </header>
         <section class="event__details">
-          ${createOffersBLockTemplate(offersByType, offers)}
+          ${createOffersBLockTemplate(offersByType, offers, isDisabled)}
           ${createDestinationBlockTemplate(pointDestination)}
         </section>
       </form>

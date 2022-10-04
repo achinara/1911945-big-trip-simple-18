@@ -29,6 +29,41 @@ export default class PointPresenter {
     this.#changeMode = changeMode;
   }
 
+  setSaving = () => {
+    if (this.#mode === Mode.EDITING) {
+      this.#pointEditComponent.updateElement({
+        isDisabled: true,
+        isSaving: true,
+      });
+    }
+  };
+
+  setDeleting = () => {
+    if (this.#mode === Mode.EDITING) {
+      this.#pointEditComponent.updateElement({
+        isDisabled: true,
+        isDeleting: true,
+      });
+    }
+  };
+
+  setAborting = () => {
+    if (this.#mode === Mode.DEFAULT) {
+      this.#pointComponent.shake();
+      return;
+    }
+
+    const resetFormState = () => {
+      this.#pointEditComponent.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this.#pointEditComponent.shake(resetFormState);
+  };
+
   #replacePointToForm = () => {
     replace(this.#pointEditComponent, this.#pointComponent);
     this.#addEventEscDown();
@@ -70,7 +105,6 @@ export default class PointPresenter {
       UpdateType.PATCH,
       point,
     );
-    this.#replaceFormToPoint();
   };
 
   #handleDelete = (point) => {
