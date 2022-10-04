@@ -1,4 +1,3 @@
-import uniqid from 'uniqid';
 import {render, remove, RenderPosition} from '../framework/render';
 import PointEditView from '../view/point-edit-view';
 import {UserAction, UpdateType} from '../const';
@@ -10,12 +9,12 @@ export default class PointNewPresenter {
   #pointEditComponent = null;
   #destroyCallback = null;
 
-  #offers = null;
-  #destinations = null;
+  #offersModel = null;
+  #destinationModel = null;
 
-  constructor(container, offers, destinations, changeData) {
-    this.#offers = offers;
-    this.#destinations = destinations;
+  constructor(container, offersModel, destinationsModel, changeData) {
+    this.#offersModel = offersModel;
+    this.#destinationModel = destinationsModel;
     this.#pointListContainer = container;
     this.#changeData = changeData;
   }
@@ -35,13 +34,31 @@ export default class PointNewPresenter {
     document.removeEventListener('keydown', this.#escKeyDownHandler);
   };
 
+  setSaving = () => {
+    this.#pointEditComponent.updateElement({
+      isDisabled: true,
+      isSaving: true,
+    });
+  };
+
+  setAborting = () => {
+    const resetFormState = () => {
+      this.#pointEditComponent.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this.#pointEditComponent.shake(resetFormState);
+  };
+
   #handleFormSubmit = (point) => {
     this.#changeData(
       UserAction.ADD_POINT,
       UpdateType.MINOR,
-      {...point, id: uniqid()},
+      point,
     );
-    this.destroy();
   };
 
   #handleDeleteForm = () => {
@@ -60,13 +77,21 @@ export default class PointNewPresenter {
     this.#removeEventEscDown();
   };
 
+  get offers() {
+    return this.#offersModel.offers;
+  }
+
+  get destinations() {
+    return this.#destinationModel.destinations;
+  }
+
   init = (callback) => {
     this.#destroyCallback = callback;
     if (this.#pointEditComponent !== null) {
       return;
     }
 
-    this.#pointEditComponent = new PointEditView(null, this.#destinations, this.#offers);
+    this.#pointEditComponent = new PointEditView(null, this.destinations, this.offers);
 
     this.#pointEditComponent.setSubmitFormHandler(this.#handleFormSubmit);
     this.#pointEditComponent.setDeleteHandler(this.#handleDeleteForm);

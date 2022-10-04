@@ -6,7 +6,7 @@ import {formatFullTime} from '../utils/format-date';
 import 'flatpickr/dist/flatpickr.min.css';
 
 const BLANK_POINT = {
-  basePrice: '',
+  basePrice: 5,
   dateFrom: dayjs(),
   dateTo: dayjs().add(1, 'd'),
   destination: '',
@@ -30,7 +30,7 @@ const createDestinationSelectTemplate = (pointId, pointType, current = '', desti
   return `
     <div class="event__field-group event__field-group--destination">
       <label class="event__label event__type-output" for="event-destination-${pointId}">${pointType}</label>
-     <input class="event__input  event__input--destination" id="event-destination-${pointId}" type="text" name="event-destination" value="${current}" list="destination-list-${pointId}">
+      <input class="event__input  event__input--destination" id="event-destination-${pointId}" type="text" name="event-destination" value="${current}" list="destination-list-${pointId}" required>
       <datalist id="destination-list-${pointId}">${options}</datalist>
     </div>
   `;
@@ -78,14 +78,41 @@ const createDestinationBlockTemplate = (destination) => {
     </section>`;
 };
 
-const createCloseBtn = () => `
-  <button class="event__rollup-btn" type="button">
-    <span class="visually-hidden">Open event</span>
-  </button>
-`;
+const createCloseBtnTemplate = (isNewPoint) => {
+  if (isNewPoint) {
+    return '';
+  }
+  return `
+    <button class="event__rollup-btn" type="button">
+      <span class="visually-hidden">Open event</span>
+    </button>
+  `;
+};
+
+const createCancelBtnTemplate = (isNewPoint, isDeleting, isDisabled) => {
+  if (isNewPoint) {
+    return '<button class="event__reset-btn" type="reset">Cancel</button>';
+  }
+  return `<button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}>${isDeleting ? 'Deleting...' : 'Delete'}</button>`;
+};
 
 const createPointEditTemplate = (data) => {
-  const {id: pointId, basePrice, dateFrom, dateTo, offers, pointDestination, type, destinations, types, offersByType, isNewPoint} = data;
+  const {
+    id: pointId,
+    basePrice,
+    dateFrom,
+    dateTo,
+    offers,
+    pointDestination,
+    type,
+    destinations,
+    types,
+    offersByType,
+    isDisabled,
+    isNewPoint,
+    isDeleting,
+    isSaving,
+  } = data;
   return `
     <li class="trip-events__item">
       <form class="event event--edit" action="#" method="post">
@@ -109,10 +136,10 @@ const createPointEditTemplate = (data) => {
 
           <div class="event__field-group event__field-group--time">
             <label class="visually-hidden" for="event-start-time-${pointId}">From</label>
-            <input class="event__input  event__input--time" id="event-start-time-${pointId}" type="text" name="event-start-time" value=${formatFullTime(dateFrom)}>
+            <input class="event__input event__input--time" id="event-start-time-${pointId}" type="text" name="event-start-time" ${isDisabled ? 'disabled' : ''} value="${formatFullTime(dateFrom)}">
             &mdash;
             <label class="visually-hidden" for="event-end-time-${pointId}">To</label>
-            <input class="event__input event__input--time" id="event-end-time-${pointId}" type="text" name="event-end-time" value=${formatFullTime(dateTo)}>
+            <input class="event__input event__input--time" id="event-end-time-${pointId}" type="text" name="event-end-time" ${isDisabled ? 'disabled' : ''} value="${formatFullTime(dateTo)}">
           </div>
 
           <div class="event__field-group event__field-group--price">
@@ -120,15 +147,15 @@ const createPointEditTemplate = (data) => {
               <span class="visually-hidden">Price</span>
               &euro;
             </label>
-            <input class="event__input event__input--price" id="event-price-${pointId}" type="number" min="0" name="event-price" value="${basePrice}">
+            <input class="event__input event__input--price" id="event-price-${pointId}" type="number" min="1" name="event-price" value="${basePrice}">
           </div>
 
-          <button class="event__save-btn btn btn--blue" type="submit">Save</button>
-          <button class="event__reset-btn" type="reset">${isNewPoint ? 'Cancel' : 'Delete'}</button>
-          ${isNewPoint ? '' : createCloseBtn()}
+          <button class="event__save-btn btn btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>${isSaving ? 'Saving...' : 'Save'}</button>
+          ${createCancelBtnTemplate(isNewPoint, isDeleting, isDisabled)}
+          ${createCloseBtnTemplate(isNewPoint)}
         </header>
         <section class="event__details">
-          ${createOffersBLockTemplate(offersByType, offers)}
+          ${createOffersBLockTemplate(offersByType, offers, isDisabled)}
           ${createDestinationBlockTemplate(pointDestination)}
         </section>
       </form>
@@ -164,6 +191,9 @@ export default class PointEditView extends AbstractStatefulView {
 
   #submitHandler = (evt) => {
     evt.preventDefault();
+    if (!this._state.destination || this._state.dateFrom > this._state.dateTo) {
+      return;
+    }
     this._callback.submit(PointEditView.parseStateToPoint(this._state));
   };
 
@@ -225,7 +255,7 @@ export default class PointEditView extends AbstractStatefulView {
       this.element.querySelector(`#event-start-time-${id}`),
       {
         enableTime: true,
-        dateFormat: 'Y/m/d H:i',
+        dateFormat: 'd/m/y H:i',
         defaultDate: dateFrom,
         onChange: this.#changeDateFromHandler,
       },
@@ -235,7 +265,7 @@ export default class PointEditView extends AbstractStatefulView {
       this.element.querySelector(`#event-end-time-${id}`),
       {
         enableTime: true,
-        dateFormat: 'Y/m/d H:i',
+        dateFormat: 'd/m/y H:i',
         defaultDate: dateTo,
         onChange: this.#changeDateToHandler,
       },
@@ -311,6 +341,9 @@ export default class PointEditView extends AbstractStatefulView {
       type: isNewPoint ? types[0] : point.type,
       types,
       isNewPoint,
+      isDisabled: false,
+      isSaving: false,
+      isDeleting: false,
     };
   };
 
@@ -325,6 +358,9 @@ export default class PointEditView extends AbstractStatefulView {
     delete point.types;
     delete point.destinations;
     delete point.isNewPoint;
+    delete point.isDisabled;
+    delete point.isSaving;
+    delete point.isDeleting;
     return point;
   };
 }
